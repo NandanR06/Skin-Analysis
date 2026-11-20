@@ -1,5 +1,5 @@
 #!/bin/sh
-echo ">> [Husky] Running pre-commit validation checks..."
-echo ">> Validating code formatting (Prettier) & quality (ESLint)..."
+echo ">>-------------Running pre-commit validation checks...-------------------<<"
+echo ">>-------------Validating code formatting (Prettier) & quality (ESLint)...----------<<"
 npx lint-staged
-echo ">> [Husky] All pre-commit checks passed successfully!"
+echo ">>-------------All pre-commit checks passed successfully!-------------<<"
