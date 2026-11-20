@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { AppText, AppButton, AppCard, AppProgressBar } from '../components/ui';
-import { useTheme } from '../hooks/use-theme';
-import { Spacing, Radii } from '../constants/theme';
-import { useProfileStore } from '../store/useProfileStore';
-import { SkinProfile } from '../types/profile';
+import { AppText, AppButton, AppProgressBar } from '@/components/ui';
+import { Spacing, Radii, Colors } from '@/constants/theme';
+import { useProfileStore } from '@/store/useProfileStore';
+import { SkinProfile } from '@/types/profile';
+
+const C = Colors.light;
 
 interface Question {
   id: keyof SkinProfile;
@@ -69,15 +70,14 @@ const QUESTIONS: Question[] = [
     title: 'What is your preferred daily routine commitment?',
     subtitle: 'We tailor the number of steps to match your lifestyle.',
     options: [
-      { label: 'Minimal (3 essential steps: Cleanse, Hydrate, Protect)', value: 'minimal_3step' },
-      { label: 'Balanced (4-5 steps with targeted active treatment)', value: 'balanced_4to5step' },
+      { label: 'Minimal (3 essential steps)', value: 'minimal_3step' },
+      { label: 'Balanced (4–5 steps with targeted treatment)', value: 'balanced_4to5step' },
       { label: 'Comprehensive (6+ steps multi-layered approach)', value: 'comprehensive' },
     ],
   },
 ];
 
 export default function QuestionnaireScreen() {
-  const { colors } = useTheme();
   const { profile, updateProfile } = useProfileStore();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Partial<SkinProfile>>(profile);
@@ -94,40 +94,49 @@ export default function QuestionnaireScreen() {
     if (currentIdx < QUESTIONS.length - 1) {
       setCurrentIdx(i => i + 1);
     } else {
-      // Save completed profile
       await updateProfile(answers);
       router.back();
     }
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
+      {/* Top bar */}
       <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} style={styles.closeBtn}>
-          <AppText variant="h2">✕</AppText>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.closeBtn}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <AppText variant="h2" color={C.textSecondary}>
+            ✕
+          </AppText>
         </Pressable>
         <AppText variant="h3">
-          Question {currentIdx + 1} of {QUESTIONS.length}
+          {currentIdx + 1} of {QUESTIONS.length}
         </AppText>
         <View style={{ width: 32 }} />
       </View>
 
-      <AppProgressBar
-        progress={progress}
-        color={colors.primary}
-        height={4}
-        style={{ marginBottom: Spacing.md }}
-      />
+      {/* Progress */}
+      <AppProgressBar progress={progress} color={C.primary} height={4} style={styles.progressBar} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.questionHeader}>
-          <AppText variant="h1">{currentQ.title}</AppText>
-          <AppText variant="body" muted>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Question */}
+        <View style={styles.questionBlock}>
+          <AppText variant="overline" color={C.primary}>
+            QUESTION {currentIdx + 1}
+          </AppText>
+          <AppText variant="h2" style={{ marginTop: Spacing.xs }}>
+            {currentQ.title}
+          </AppText>
+          <AppText variant="body" color={C.textMuted} style={{ marginTop: 4 }}>
             {currentQ.subtitle}
           </AppText>
         </View>
 
-        <View style={styles.optionsList}>
+        {/* Options */}
+        <View style={styles.options}>
           {currentQ.options.map(opt => {
             const isSelected = selectedValue === opt.value;
             return (
@@ -137,27 +146,18 @@ export default function QuestionnaireScreen() {
                 style={[
                   styles.optionCard,
                   {
-                    borderColor: isSelected ? colors.primary : colors.border,
-                    backgroundColor: isSelected ? colors.secondary : colors.surface,
+                    borderColor: isSelected ? C.primary : C.border,
+                    backgroundColor: isSelected ? C.secondary : '#FFFFFF',
                   },
                 ]}
               >
-                <View
-                  style={[
-                    styles.radioCircle,
-                    {
-                      borderColor: isSelected ? colors.primary : colors.border,
-                    },
-                  ]}
-                >
-                  {isSelected ? (
-                    <View style={[styles.radioDot, { backgroundColor: colors.primary }]} />
-                  ) : null}
+                <View style={[styles.radio, { borderColor: isSelected ? C.primary : C.border }]}>
+                  {isSelected && <View style={[styles.radioDot, { backgroundColor: C.primary }]} />}
                 </View>
                 <AppText
                   variant="body"
-                  color={isSelected ? colors.primary : colors.text}
-                  style={[styles.optionLabel, isSelected && { fontWeight: '600' }]}
+                  color={isSelected ? C.primary : C.text}
+                  style={[styles.optLabel, isSelected && { fontWeight: '600' }]}
                 >
                   {opt.label}
                 </AppText>
@@ -167,12 +167,11 @@ export default function QuestionnaireScreen() {
         </View>
       </ScrollView>
 
-      <View
-        style={[styles.footer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}
-      >
+      {/* Footer */}
+      <View style={styles.footer}>
         {currentIdx > 0 ? (
           <AppButton
-            title="Back"
+            title="← Back"
             onPress={() => setCurrentIdx(i => i - 1)}
             variant="outline"
             size="md"
@@ -180,7 +179,7 @@ export default function QuestionnaireScreen() {
           />
         ) : null}
         <AppButton
-          title={currentIdx === QUESTIONS.length - 1 ? 'Save Profile' : 'Next Question'}
+          title={currentIdx === QUESTIONS.length - 1 ? 'Save Profile ✓' : 'Next →'}
           onPress={handleNext}
           disabled={!selectedValue}
           variant="primary"
@@ -193,9 +192,7 @@ export default function QuestionnaireScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1, backgroundColor: C.background },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -203,19 +200,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
   },
-  closeBtn: {
-    padding: Spacing.xs,
+  closeBtn: { padding: Spacing.xs },
+  progressBar: {
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.md,
   },
-  scrollContent: {
+  scroll: {
     padding: Spacing.lg,
     gap: Spacing.lg,
+    paddingBottom: 20,
   },
-  questionHeader: {
-    gap: Spacing.xs,
-  },
-  optionsList: {
-    gap: Spacing.sm,
-  },
+  questionBlock: { gap: 0 },
+  options: { gap: Spacing.sm },
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -224,26 +220,24 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     gap: Spacing.md,
   },
-  radioCircle: {
+  radio: {
     width: 22,
     height: 22,
     borderRadius: 11,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  optionLabel: {
-    flex: 1,
-  },
+  radioDot: { width: 10, height: 10, borderRadius: 5 },
+  optLabel: { flex: 1 },
   footer: {
     flexDirection: 'row',
     padding: Spacing.md,
+    paddingBottom: Spacing.lg,
     borderTopWidth: 1,
+    borderTopColor: C.border,
+    backgroundColor: C.surface,
     gap: Spacing.sm,
   },
 });

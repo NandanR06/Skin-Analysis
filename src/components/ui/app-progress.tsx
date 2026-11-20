@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { Radii } from '../../constants/theme';
-import { useTheme } from '../../hooks/use-theme';
+import { Radii, Colors } from '@/constants/theme';
+
+const C = Colors.light;
 
 export interface AppProgressBarProps {
   progress: number; // 0 to 1
@@ -10,13 +11,12 @@ export interface AppProgressBarProps {
   style?: StyleProp<ViewStyle>;
 }
 
-export function AppProgressBar({ progress, color, height = 6, style }: AppProgressBarProps) {
-  const { colors } = useTheme();
+export function AppProgressBar({ progress, color, height = 7, style }: AppProgressBarProps) {
   const clamped = Math.max(0, Math.min(1, progress));
-  const barColor = color ?? colors.primary;
+  const barColor = color ?? C.primary;
 
   return (
-    <View style={[styles.track, { height, backgroundColor: colors.border }, style]}>
+    <View style={[styles.track, { height, backgroundColor: C.border }, style]}>
       <View
         style={[
           styles.fill,
@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: Radii.pill,
     overflow: 'hidden',
+    backgroundColor: '#E5EFEA',
   },
   fill: {
     height: '100%',

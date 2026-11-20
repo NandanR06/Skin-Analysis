@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { Radii, Spacing } from '../../constants/theme';
-import { useTheme } from '../../hooks/use-theme';
+import { Radii, Spacing, Colors } from '@/constants/theme';
 import { AppText } from './app-text';
 
-export type BadgeVariant = 'success' | 'warning' | 'info' | 'neutral' | 'accentRose';
+const C = Colors.light;
+
+export type BadgeVariant = 'success' | 'warning' | 'info' | 'neutral' | 'accentRose' | 'error';
 
 export interface AppBadgeProps {
   label: string;
@@ -13,28 +14,28 @@ export interface AppBadgeProps {
 }
 
 export function AppBadge({ label, variant = 'neutral', style }: AppBadgeProps) {
-  const { colors } = useTheme();
-
   const getColors = () => {
     switch (variant) {
       case 'success':
-        return { bg: colors.success + '20', text: colors.success };
+        return { bg: '#D1FAE5', text: '#065F46' };
       case 'warning':
-        return { bg: colors.warning + '20', text: colors.warning };
+        return { bg: '#FEF3C7', text: '#92400E' };
       case 'info':
-        return { bg: colors.primary + '18', text: colors.primary };
+        return { bg: C.primaryLight, text: C.primary };
       case 'accentRose':
-        return { bg: colors.accentRose + '20', text: colors.accentRose };
+        return { bg: '#FDECEA', text: '#B91C1C' };
+      case 'error':
+        return { bg: '#FEE2E2', text: '#B91C1C' };
       default:
-        return { bg: colors.secondary, text: colors.textSecondary };
+        return { bg: C.secondary, text: C.textSecondary };
     }
   };
 
-  const badgeTheme = getColors();
+  const { bg, text } = getColors();
 
   return (
-    <View style={[styles.badge, { backgroundColor: badgeTheme.bg }, style]}>
-      <AppText variant="caption" style={[styles.text, { color: badgeTheme.text }]}>
+    <View style={[styles.badge, { backgroundColor: bg }, style]}>
+      <AppText variant="caption" style={[styles.text, { color: text }]}>
         {label}
       </AppText>
     </View>
@@ -43,14 +44,14 @@ export function AppBadge({ label, variant = 'neutral', style }: AppBadgeProps) {
 
 const styles = StyleSheet.create({
   badge: {
-    paddingHorizontal: Spacing.sm + 2,
-    paddingVertical: Spacing.xs,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: Radii.pill,
     alignSelf: 'flex-start',
   },
   text: {
-    fontWeight: '600',
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
   },
 });

@@ -1,4 +1,4 @@
-import { ImageQualityAssessment } from '../../types/scan';
+import { ImageQualityAssessment } from '@/types/scan';
 
 export interface RawQualityInputs {
   faceDetected: boolean;

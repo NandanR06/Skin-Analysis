@@ -1,55 +1,55 @@
+// ─── Light-only palette — dark mode is intentionally disabled ───────────────
+// Aesthetic: Clean clinical-spa — white surfaces, sage green accents,
+// warm rose/amber indicators, generous whitespace.
+
 export const Colors = {
   light: {
-    background: '#F8F9FA',
+    // Backgrounds
+    background: '#F7F9F8', // Very light sage tint
     surface: '#FFFFFF',
     surfaceElevated: '#FFFFFF',
-    text: '#111827',
-    textSecondary: '#6B7280',
-    textMuted: '#9CA3AF',
-    primary: '#1E6F5C', // Calming botanical green (skincare aesthetic)
+    surfaceTint: '#EEF5F1', // Subtle green tint for section backgrounds
+
+    // Text hierarchy
+    text: '#0F2419', // Deep forest — highest contrast
+    textSecondary: '#4A6358', // Sage-tinted grey
+    textMuted: '#8FA89E', // Muted green-grey
+
+    // Brand greens
+    primary: '#1A6B4A', // Deep botanical green
+    primaryLight: '#D4EDE0', // Very light green for tinted surfaces
     primaryForeground: '#FFFFFF',
-    secondary: '#E8F1EE',
-    secondaryForeground: '#1E6F5C',
-    accent: '#289672',
-    accentRose: '#E07A5F', // For redness indicator
-    accentAmber: '#E76F51', // For warm/glow indicator
-    accentCyan: '#2A9D8F', // For hydration indicator
-    border: '#E5E7EB',
+    secondary: '#E8F4ED', // Soft mint card background
+    secondaryForeground: '#1A6B4A',
+
+    // Accents
+    accent: '#24936A',
+    accentRose: '#D4635A', // Redness indicator
+    accentAmber: '#C87941', // Glow / warmth indicator
+    accentCyan: '#2B8C80', // Hydration indicator
+    accentSage: '#7DAA94', // Softer green for decorative elements
+
+    // Surfaces & Borders
+    border: '#DDE9E3',
+    borderSubtle: '#EEF5F1',
     card: '#FFFFFF',
-    cardBorder: '#EEF2F6',
-    tint: '#1E6F5C',
-    tabIconDefault: '#9CA3AF',
-    tabIconSelected: '#1E6F5C',
-    success: '#10B981',
-    warning: '#F59E0B',
-    error: '#EF4444',
-  },
-  dark: {
-    background: '#0D1317',
-    surface: '#151F24',
-    surfaceElevated: '#1D2A32',
-    text: '#F9FAFB',
-    textSecondary: '#9CA3AF',
-    textMuted: '#6B7280',
-    primary: '#289672',
-    primaryForeground: '#FFFFFF',
-    secondary: '#1A2E27',
-    secondaryForeground: '#52B788',
-    accent: '#52B788',
-    accentRose: '#E07A5F',
-    accentAmber: '#F4A261',
-    accentCyan: '#48CAE4',
-    border: '#2A3B45',
-    card: '#151F24',
-    cardBorder: '#23323B',
-    tint: '#52B788',
-    tabIconDefault: '#6B7280',
-    tabIconSelected: '#52B788',
-    success: '#10B981',
-    warning: '#F59E0B',
-    error: '#EF4444',
+    cardBorder: '#E5EFEA',
+
+    // Tab bar
+    tint: '#1A6B4A',
+    tabIconDefault: '#A0BAB1',
+    tabIconSelected: '#1A6B4A',
+
+    // Semantic
+    success: '#1A9E6A',
+    warning: '#D97706',
+    error: '#DC2626',
+    info: '#0C7ABF',
   },
 } as const;
+
+// Always use light colors — no dark mode
+export const C = Colors.light;
 
 export const Spacing = {
   xs: 4,
@@ -62,22 +62,24 @@ export const Spacing = {
 
 export const Radii = {
   sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
+  md: 14,
+  lg: 20,
+  xl: 28,
   pill: 9999,
 } as const;
 
 export const Typography = {
   display: {
-    fontSize: 28,
-    fontWeight: '700' as const,
-    lineHeight: 36,
+    fontSize: 30,
+    fontWeight: '800' as const,
+    lineHeight: 38,
+    letterSpacing: -0.5,
   },
   h1: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700' as const,
-    lineHeight: 28,
+    lineHeight: 30,
+    letterSpacing: -0.3,
   },
   h2: {
     fontSize: 18,
@@ -85,9 +87,9 @@ export const Typography = {
     lineHeight: 24,
   },
   h3: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600' as const,
-    lineHeight: 22,
+    lineHeight: 21,
   },
   bodyLarge: {
     fontSize: 16,
@@ -97,11 +99,41 @@ export const Typography = {
   body: {
     fontSize: 14,
     fontWeight: '400' as const,
-    lineHeight: 20,
+    lineHeight: 21,
   },
   caption: {
     fontSize: 12,
     fontWeight: '400' as const,
     lineHeight: 16,
+  },
+  overline: {
+    fontSize: 11,
+    fontWeight: '700' as const,
+    lineHeight: 14,
+    letterSpacing: 1.2,
+  },
+} as const;
+
+export const Shadow = {
+  sm: {
+    shadowColor: '#0F2419',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#0F2419',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: '#0F2419',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 8,
   },
 } as const;

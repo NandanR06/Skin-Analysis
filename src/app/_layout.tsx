@@ -1,14 +1,26 @@
 import React from 'react';
 import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
+/**
+ * Root Layout
+ * Responsible only for:
+ * - Global providers (e.g. StatusBar, Theme)
+ * - Automatic file-based route discovery (Expo Router discovers routes from directory structure)
+ */
 export default function RootLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="scan/camera" options={{ presentation: 'fullScreenModal' }} />
-      <Stack.Screen name="scan/processing" options={{ gestureEnabled: false }} />
-      <Stack.Screen name="scan/results" />
-      <Stack.Screen name="questionnaire" options={{ presentation: 'modal' }} />
-    </Stack>
+    <>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Modal presentation configured at the root modal level */}
+        <Stack.Screen
+          name="questionnaire"
+          options={{
+            presentation: 'modal',
+          }}
+        />
+      </Stack>
+    </>
   );
 }

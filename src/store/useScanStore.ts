@@ -1,6 +1,6 @@
+import { ScanReport } from '@/types/scan';
+import { SafeStorage } from '@/utils/safeStorage';
 import { create } from 'zustand';
-import { SafeStorage } from '../utils/safeStorage';
-import { ScanReport } from '../types/scan';
 
 const SCAN_HISTORY_STORAGE_KEY = '@fskin_scan_history';
 

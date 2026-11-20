@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { AppText, AppButton, AppCard, AppBadge } from '../../components/ui';
-import { useTheme } from '../../hooks/use-theme';
-import { Spacing, Radii } from '../../constants/theme';
-import { useProfileStore } from '../../store/useProfileStore';
-import { useScanStore } from '../../store/useScanStore';
+import { AppText, AppButton, AppCard, AppBadge } from '@/components/ui';
+import { Spacing, Radii, Colors, Shadow } from '@/constants/theme';
+import { useProfileStore } from '@/store/useProfileStore';
+import { useScanStore } from '@/store/useScanStore';
+
+const C = Colors.light;
 
 export default function ProfileScreen() {
-  const { colors } = useTheme();
   const { profile, resetProfile } = useProfileStore();
   const { scanHistory, deleteScanFromHistory, clearAllScanHistory, setCurrentReport } =
     useScanStore();
@@ -36,80 +36,73 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-            <AppText variant="h1" color={colors.primaryForeground}>
-              👤
-            </AppText>
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* ── Profile Hero ─────────────────────────── */}
+        <View style={styles.heroSection}>
+          <View style={[styles.avatarCircle, { backgroundColor: C.primary }]}>
+            <AppText style={{ fontSize: 36 }}>👤</AppText>
           </View>
-          <View style={styles.headerInfo}>
-            <AppText variant="h1">Skin Profile & Privacy</AppText>
-            <AppText variant="body" muted>
-              Manage preferences, history, and on-device data.
+          <View style={{ flex: 1 }}>
+            <AppText variant="h1">Skin Profile</AppText>
+            <AppText variant="body" color={C.textMuted} style={{ marginTop: 4 }}>
+              Manage preferences, history & on-device data
             </AppText>
           </View>
         </View>
 
-        {/* Skin Profile Summary Card */}
+        {/* ── Profile Details Card ─────────────────── */}
         <AppCard elevated style={styles.profileCard}>
           <View style={styles.cardHeader}>
-            <AppText variant="h2">Skin Profile</AppText>
+            <AppText variant="h2">Questionnaire</AppText>
             <AppBadge
               label={profile.completedAt ? 'Completed' : 'Pending'}
               variant={profile.completedAt ? 'success' : 'warning'}
             />
           </View>
 
-          <View style={styles.detailRow}>
-            <AppText variant="body" muted>
-              Skin Feel:
-            </AppText>
-            <AppText variant="body" style={styles.capitalize}>
-              {profile.skinFeel.replace('_', ' ')}
-            </AppText>
-          </View>
+          <View style={styles.divider} />
 
-          <View style={styles.detailRow}>
-            <AppText variant="body" muted>
-              Sensitivity:
-            </AppText>
-            <AppText variant="body" style={styles.capitalize}>
-              {profile.sensitivity.replace('_', ' ')}
-            </AppText>
-          </View>
-
-          <View style={styles.detailRow}>
-            <AppText variant="body" muted>
-              Primary Concerns:
-            </AppText>
-            <AppText variant="body" style={styles.capitalize}>
-              {profile.primaryConcerns.map(c => c.replace('_', ' ')).join(', ')}
-            </AppText>
-          </View>
+          <DetailRow label="Skin Feel" value={profile.skinFeel.replace('_', ' ')} />
+          <DetailRow label="Sensitivity" value={profile.sensitivity.replace('_', ' ')} />
+          <DetailRow
+            label="Concerns"
+            value={profile.primaryConcerns.map(c => c.replace('_', ' ')).join(', ') || 'Not set'}
+          />
 
           <AppButton
             title={profile.completedAt ? 'Update Questionnaire' : 'Complete Questionnaire'}
             onPress={() => router.push('/questionnaire')}
             variant="outline"
             size="md"
-            style={{ marginTop: Spacing.xs }}
+            style={{ marginTop: Spacing.sm }}
           />
         </AppCard>
 
-        {/* Scan History Section */}
+        {/* ── Scan History Card ────────────────────── */}
         <AppCard elevated style={styles.historyCard}>
           <View style={styles.cardHeader}>
             <AppText variant="h2">Scan History</AppText>
-            <AppBadge label={`${scanHistory.length} Scans`} variant="neutral" />
+            <View style={[styles.countBadge, { backgroundColor: C.secondary }]}>
+              <AppText variant="caption" color={C.primary} style={{ fontWeight: '700' }}>
+                {scanHistory.length}
+              </AppText>
+            </View>
           </View>
 
+          <View style={styles.divider} />
+
           {scanHistory.length === 0 ? (
-            <AppText variant="body" muted style={{ paddingVertical: Spacing.sm }}>
-              No previous scans saved. Completed face scans will appear here.
-            </AppText>
+            <View style={styles.emptyHistory}>
+              <AppText style={{ fontSize: 32, textAlign: 'center' }}>🔬</AppText>
+              <AppText
+                variant="body"
+                color={C.textMuted}
+                style={{ textAlign: 'center', marginTop: 8 }}
+              >
+                No scans yet. Complete a face scan to build your history.
+              </AppText>
+            </View>
           ) : (
             <View style={styles.historyList}>
               {scanHistory.map(scan => (
@@ -117,17 +110,19 @@ export default function ProfileScreen() {
                   key={scan.scanId}
                   onPress={() => {
                     setCurrentReport(scan);
-                    router.push('/scan/results');
+                    router.push({
+                      pathname: '/scan/[id]',
+                      params: { id: scan.scanId },
+                    });
                   }}
                   style={({ pressed }) => [
                     styles.historyItem,
-                    { borderColor: colors.border },
-                    pressed && { backgroundColor: colors.secondary },
+                    pressed && { backgroundColor: C.secondary },
                   ]}
                 >
-                  <View style={styles.historyItemLeft}>
+                  <View style={{ flex: 1 }}>
                     <AppText variant="h3">{scan.summaryObservations.primaryFocus}</AppText>
-                    <AppText variant="caption" muted>
+                    <AppText variant="caption" color={C.textMuted} style={{ marginTop: 2 }}>
                       {new Date(scan.capturedAt).toLocaleDateString(undefined, {
                         month: 'short',
                         day: 'numeric',
@@ -138,13 +133,9 @@ export default function ProfileScreen() {
                     </AppText>
                   </View>
 
-                  <View style={styles.historyItemRight}>
-                    <View style={[styles.scorePill, { backgroundColor: colors.secondary }]}>
-                      <AppText
-                        variant="caption"
-                        color={colors.primary}
-                        style={{ fontWeight: '700' }}
-                      >
+                  <View style={styles.historyRight}>
+                    <View style={[styles.scorePill, { backgroundColor: C.secondary }]}>
+                      <AppText variant="caption" color={C.primary} style={{ fontWeight: '700' }}>
                         {scan.overallScore}
                       </AppText>
                     </View>
@@ -153,9 +144,9 @@ export default function ProfileScreen() {
                         e.stopPropagation();
                         deleteScanFromHistory(scan.scanId);
                       }}
-                      style={styles.deleteBtn}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                      <AppText variant="caption" color={colors.error}>
+                      <AppText variant="caption" color={C.error}>
                         ✕
                       </AppText>
                     </Pressable>
@@ -166,10 +157,14 @@ export default function ProfileScreen() {
           )}
         </AppCard>
 
-        {/* Privacy & Ethical Standards */}
-        <AppCard elevated style={styles.privacyCard}>
+        {/* ── Privacy Card ─────────────────────────── */}
+        <AppCard tinted style={styles.privacyCard}>
           <AppText variant="h3">🔒 Privacy & Data Retention</AppText>
-          <AppText variant="body" muted style={styles.privacyDesc}>
+          <AppText
+            variant="body"
+            color={C.textSecondary}
+            style={{ marginTop: Spacing.sm, lineHeight: 20 }}
+          >
             All image quality checks and cosmetic observations execute entirely on your device. We
             do not store raw face images in the cloud or perform facial identity recognition.
           </AppText>
@@ -177,9 +172,9 @@ export default function ProfileScreen() {
             title="Delete All Data & History"
             onPress={handleClearData}
             loading={clearing}
-            variant="outline"
+            variant="danger"
             size="md"
-            style={styles.dangerButton}
+            style={{ marginTop: Spacing.sm }}
           />
         </AppCard>
       </ScrollView>
@@ -187,88 +182,93 @@ export default function ProfileScreen() {
   );
 }
 
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={rowStyles.row}>
+      <AppText variant="body" color={C.textMuted}>
+        {label}
+      </AppText>
+      <AppText
+        variant="body"
+        style={{ fontWeight: '500', textTransform: 'capitalize', flex: 1, textAlign: 'right' }}
+      >
+        {value}
+      </AppText>
+    </View>
+  );
+}
+
+const rowStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: Spacing.xs,
+    gap: Spacing.md,
+  },
+});
+
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  container: {
-    padding: Spacing.lg,
-    gap: Spacing.lg,
-  },
-  header: {
+  safe: { flex: 1, backgroundColor: C.background },
+  scroll: { padding: Spacing.lg, gap: Spacing.md, paddingBottom: Spacing['2xl'] },
+
+  heroSection: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
+    marginBottom: Spacing.xs,
   },
-  avatar: {
-    width: 56,
-    height: 56,
+  avatarCircle: {
+    width: 72,
+    height: 72,
     borderRadius: Radii.pill,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  profileCard: {
-    gap: Spacing.sm,
-  },
+
+  profileCard: { gap: 0, padding: Spacing.lg },
+  historyCard: { gap: 0, padding: Spacing.lg },
+  privacyCard: { gap: 0 },
+
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: Spacing.sm,
   },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 2,
+  divider: {
+    height: 1,
+    backgroundColor: C.border,
+    marginBottom: Spacing.sm,
   },
-  capitalize: {
-    textTransform: 'capitalize',
-    fontWeight: '500',
+  countBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: Radii.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  historyCard: {
-    gap: Spacing.sm,
-  },
-  historyList: {
-    gap: Spacing.sm,
-    marginTop: Spacing.xs,
-  },
+
+  // History
+  emptyHistory: { paddingVertical: Spacing.lg, gap: 0 },
+  historyList: { gap: Spacing.xs },
   historyItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     padding: Spacing.md,
     borderRadius: Radii.md,
     borderWidth: 1,
+    borderColor: C.border,
+    gap: Spacing.sm,
   },
-  historyItemLeft: {
-    gap: 2,
-    flex: 1,
-  },
-  historyItemRight: {
+  historyRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
   },
   scorePill: {
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: Radii.pill,
-  },
-  deleteBtn: {
-    padding: Spacing.xs,
-  },
-  privacyCard: {
-    gap: Spacing.sm,
-  },
-  privacyDesc: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  dangerButton: {
-    marginTop: Spacing.xs,
-    borderColor: '#EF4444',
   },
 });

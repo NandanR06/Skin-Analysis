@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { SafeStorage } from '../utils/safeStorage';
-import { SkinProfile } from '../types/profile';
+import { SafeStorage } from '@/utils/safeStorage';
+import { SkinProfile } from '@/types/profile';
 
 const PROFILE_STORAGE_KEY = '@fskin_profile';
 

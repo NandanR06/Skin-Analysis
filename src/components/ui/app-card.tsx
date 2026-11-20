@@ -1,30 +1,17 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { Radii, Spacing } from '../../constants/theme';
-import { useTheme } from '../../hooks/use-theme';
+import { Radii, Spacing, Shadow } from '@/constants/theme';
 
 export interface AppCardProps {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   elevated?: boolean;
+  tinted?: boolean;
 }
 
-export function AppCard({ children, style, elevated = false }: AppCardProps) {
-  const { colors, isDark } = useTheme();
-
+export function AppCard({ children, style, elevated = false, tinted = false }: AppCardProps) {
   return (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: elevated ? colors.surfaceElevated : colors.card,
-          borderColor: colors.cardBorder,
-          shadowColor: isDark ? '#000' : '#1E293B',
-        },
-        elevated && styles.elevated,
-        style,
-      ]}
-    >
+    <View style={[styles.card, elevated && styles.elevated, tinted && styles.tinted, style]}>
       {children}
     </View>
   );
@@ -34,12 +21,16 @@ const styles = StyleSheet.create({
   card: {
     padding: Spacing.md,
     borderRadius: Radii.lg,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
+    borderColor: '#E5EFEA',
   },
   elevated: {
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+    ...Shadow.md,
+    borderWidth: 0,
+  },
+  tinted: {
+    backgroundColor: '#EEF5F1',
+    borderWidth: 0,
   },
 });

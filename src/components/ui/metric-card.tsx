@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Spacing } from '../../constants/theme';
-import { useTheme } from '../../hooks/use-theme';
+import { Spacing, Colors } from '@/constants/theme';
 import { AppCard } from './app-card';
 import { AppText } from './app-text';
 import { AppBadge } from './app-badge';
 import { AppProgressBar } from './app-progress';
+
+const C = Colors.light;
 
 export interface MetricCardProps {
   title: string;
@@ -22,7 +23,7 @@ export interface MetricCardProps {
     | 'uniform'
     | 'noticeable'
     | string;
-  scoreRatio: number; // 0 to 1
+  scoreRatio: number;
   description: string;
   color?: string;
 }
@@ -35,9 +36,7 @@ export function MetricCard({
   description,
   color,
 }: MetricCardProps) {
-  const { colors } = useTheme();
-
-  const getBadgeVariant = () => {
+  const getBadgeVariant = (): 'success' | 'info' | 'warning' | 'neutral' => {
     switch (level) {
       case 'low':
       case 'minimal':
@@ -58,29 +57,22 @@ export function MetricCard({
     }
   };
 
+  const variant = getBadgeVariant();
   const metricColor =
-    color ??
-    (getBadgeVariant() === 'success'
-      ? colors.success
-      : getBadgeVariant() === 'warning'
-        ? colors.accentRose
-        : colors.primary);
+    color ?? (variant === 'success' ? C.success : variant === 'warning' ? C.accentRose : C.primary);
 
   return (
     <AppCard elevated style={styles.card}>
       <View style={styles.header}>
-        <AppText variant="h3">{title}</AppText>
-        <AppBadge label={valueLabel} variant={getBadgeVariant()} />
+        <AppText variant="h3" style={{ flex: 1 }}>
+          {title}
+        </AppText>
+        <AppBadge label={valueLabel} variant={variant} />
       </View>
 
-      <AppProgressBar
-        progress={scoreRatio}
-        color={metricColor}
-        height={8}
-        style={styles.progress}
-      />
+      <AppProgressBar progress={scoreRatio} color={metricColor} height={8} />
 
-      <AppText variant="body" muted style={styles.description}>
+      <AppText variant="body" color={C.textSecondary} style={styles.desc}>
         {description}
       </AppText>
     </AppCard>
@@ -88,19 +80,12 @@ export function MetricCard({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    gap: Spacing.sm,
-  },
+  card: { gap: Spacing.sm },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: Spacing.sm,
   },
-  progress: {
-    marginVertical: Spacing.xs,
-  },
-  description: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
+  desc: { fontSize: 13, lineHeight: 18 },
 });

@@ -1,4 +1,4 @@
-import { Ingredient } from '../../types/recommendations';
+import { Ingredient } from '@/types/recommendations';
 
 export const INGREDIENT_DATABASE: Ingredient[] = [
   {

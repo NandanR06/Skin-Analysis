@@ -3,17 +3,17 @@ import { View, StyleSheet, Pressable, Platform, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { AppText, AppButton, AppCard, AppBadge, FaceGuideOverlay } from '../../components/ui';
-import { useTheme } from '../../hooks/use-theme';
-import { Spacing, Radii } from '../../constants/theme';
-import { useScanStore } from '../../store/useScanStore';
-import { PRESET_FACE_SCANS, getPresetReport } from '../../features/analysis/sampleScans';
+import { AppText, AppButton, AppCard, AppBadge, FaceGuideOverlay } from '@/components/ui';
+import { useTheme } from '@/hooks/use-theme';
+import { Spacing, Radii } from '@/constants/theme';
+import { useScanStore } from '@/store/useScanStore';
+import { PRESET_FACE_SCANS, getPresetReport } from '@/features/analysis/sampleScans';
 import {
   SafeCamera,
   SafeCameraRef,
   isNativeCameraAvailable,
   useSafeCameraPermissions,
-} from '../../components/camera/SafeCamera';
+} from '@/components/camera/SafeCamera';
 
 export default function CameraScreen() {
   const { colors } = useTheme();

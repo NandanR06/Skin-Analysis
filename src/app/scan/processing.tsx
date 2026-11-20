@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
-import { AppText, AppCard, AppProgressBar } from '../../components/ui';
-import { useTheme } from '../../hooks/use-theme';
-import { Spacing, Radii } from '../../constants/theme';
-import { useScanStore } from '../../store/useScanStore';
-import { getPresetReport } from '../../features/analysis/sampleScans';
-import { generateCosmeticReport } from '../../features/analysis/cosmeticHeuristics';
-import { evaluateScanQuality } from '../../features/analysis/qualityChecker';
+import { AppText, AppCard, AppProgressBar } from '@/components/ui';
+import { useTheme } from '@/hooks/use-theme';
+import { Spacing, Radii } from '@/constants/theme';
+import { useScanStore } from '@/store/useScanStore';
+import { getPresetReport } from '@/features/analysis/sampleScans';
+import { generateCosmeticReport } from '@/features/analysis/cosmeticHeuristics';
+import { evaluateScanQuality } from '@/features/analysis/qualityChecker';
 
 const PROCESSING_STEPS = [
   'Verifying illumination, exposure & focus...',

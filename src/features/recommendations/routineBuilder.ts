@@ -1,7 +1,7 @@
-import { ScanReport } from '../../types/scan';
-import { SkinProfile } from '../../types/profile';
-import { SkinCarePlan, RoutineStep, Ingredient } from '../../types/recommendations';
-import { INGREDIENT_DATABASE } from './ingredientDatabase';
+import { ScanReport } from '@/types/scan';
+import { SkinProfile } from '@/types/profile';
+import { SkinCarePlan, RoutineStep, Ingredient } from '@/types/recommendations';
+import { INGREDIENT_DATABASE } from '@/features/recommendations/ingredientDatabase';
 
 export function buildPersonalizedPlan(scan: ScanReport, profile: SkinProfile): SkinCarePlan {
   const isOily =

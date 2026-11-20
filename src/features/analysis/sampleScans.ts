@@ -1,5 +1,5 @@
 import { CosmeticAnalysisRawInputs, generateCosmeticReport } from './cosmeticHeuristics';
-import { ScanReport } from '../../types/scan';
+import { ScanReport } from '@/types/scan';
 
 export interface PresetFaceScan {
   id: string;

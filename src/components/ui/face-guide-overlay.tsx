@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import Svg, { Ellipse, Line, Rect, Circle, Defs, Mask } from 'react-native-svg';
-import { useTheme } from '../../hooks/use-theme';
+import { useTheme } from '@/hooks/use-theme';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 

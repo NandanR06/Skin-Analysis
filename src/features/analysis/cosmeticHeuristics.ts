@@ -7,7 +7,7 @@ import {
   RednessLevel,
   TextureLevel,
   ToneLevel,
-} from '../../types/scan';
+} from '@/types/scan';
 
 export interface CosmeticAnalysisRawInputs {
   imageUri?: string;

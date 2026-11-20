@@ -1,13 +1,11 @@
-import { useColorScheme } from 'react-native';
-import { Colors } from '../constants/theme';
+import { Colors } from '@/constants/theme';
 
+// Always light mode — dark mode disabled app-wide
 export function useTheme() {
-  const systemScheme = useColorScheme();
-  const isDark = systemScheme === 'dark';
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = Colors.light;
 
   return {
-    isDark,
+    isDark: false,
     colors,
   };
 }
