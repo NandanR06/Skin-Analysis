@@ -1,53 +1,83 @@
 ---
 name: code-review
-description: >-
-  Use this skill to perform automated or manual code reviews, auditing React Native and
-  Expo code for performance, architecture, TypeScript safety, security, and adherence to clean
-  code standards.
+description: Code review rubric for this Expo/React Native project. Checks TypeScript safety, mobile performance, Expo ecosystem compliance, clean architecture, and formatting.
 ---
 
-# Code Review & Quality Assurance Skill
+# Code Review Skill
 
-This skill provides a systematic review rubric for checking pull requests and code modifications in Expo and React Native codebases.
+## Review Rubric — Check All Categories
 
-## 1. Review Dimensions
+### 1. TypeScript Safety
 
-### A. Mobile Performance & Re-render Optimization
+- [ ] No `any` types (flag and ask for the proper type)
+- [ ] All props interfaces fully typed with no optional fields unless truly optional
+- [ ] `useLocalSearchParams` result validated (always a string)
+- [ ] Zustand store state shape matches TypeScript interface
+- [ ] No type assertions (`as SomeType`) without a comment explaining why
 
-- **Inline Objects & Functions**: Ensure inline functions and objects are not passed directly to high-frequency list items (use `useCallback`, `useMemo`).
-- **Lists**: Verify that large data sets use `FlashList` or `FlatList` with `keyExtractor` and `getItemLayout` (or estimated size), not `.map()` inside a `ScrollView`.
-- **Images**: Verify `expo-image` is used instead of default `react-native` Image, with explicit dimensions or aspect ratio.
-- **Heavy Computations**: Complex calculations or filtering should be memoized with `useMemo`.
+### 2. Expo / React Native Compliance
 
-### B. Architectural Hygiene & Multi-Component Modularity
+- [ ] Native modules accessed through safe wrappers (SafeCamera, safeStorage)
+- [ ] No direct `AsyncStorage` imports — use `safeStorage.ts`
+- [ ] No direct `Camera` imports without null check — use `SafeCamera`
+- [ ] All screens have `export default function ScreenName()` (Expo Router requirement)
+- [ ] No `ios/` or `android/` directory modifications
+- [ ] New packages installed via `npx expo install` (not `npm install`)
 
-- **Separation of Concerns**: Check that route files (`src/app/`) do not contain raw SQL, direct API fetching loops, or massive style sheets.
-- **Component File Size**: Flag any single component file exceeding 150-200 lines. Recommend extracting sub-components into `src/components/`.
-- **Reusable Primitives**: Check if buttons, inputs, or typography are duplicated across screens rather than using shared UI primitives.
+### 3. Clean Architecture
 
-### C. TypeScript Safety & Typing Rigor
+- [ ] `src/app/` files are thin orchestrators only (< ~100 lines of JSX)
+- [ ] No business logic in route files (move to `src/features/`)
+- [ ] No `router.push` calls inside shared components
+- [ ] No store access inside `src/components/ui/` primitives
+- [ ] Feature logic in `src/features/` has no React imports
 
-- **No `any`**: Flag any implicit or explicit `any` usage. Require precise interface or generic types.
-- **Strict Null Checks**: Guard against `undefined` or `null` property access on API payloads and route params.
-- **Props Typing**: Every component must declare explicit prop types with clear optionality (`?`).
+### 4. Mobile Performance
 
-### D. Expo & Native Ecosystem Rules
+- [ ] `useCallback` on event handlers passed to `FlatList` / `FlashList` items
+- [ ] `StyleSheet.create()` used for all static styles (not inline objects)
+- [ ] No heavy computation in component render body — moved to useMemo/useCallback
+- [ ] Images use `expo-image` (not `Image` from React Native) where caching matters
+- [ ] Long lists use `FlashList` not `FlatList`
 
-- **Expo Version Compatibility**: Cross-check packages with Expo SDK compatibility (`npx expo-doctor`, `npx expo install <pkg>`).
-- **Routing**: Ensure Expo Router navigation rules are followed (`Link`, `router.push`, `useLocalSearchParams`).
-- **SafeArea**: Check that screens handle safe areas and status bar overlaps on devices with dynamic islands or notches.
+### 5. Formatting & Linting
 
-### E. Code Style, Linting & Formatting
+- [ ] File passes `npm run format:check`
+- [ ] File passes `npx expo lint`
+- [ ] No unused imports
+- [ ] No `console.log` in production code (use a logger or remove)
+- [ ] No `TODO` / `FIXME` without a tracking issue reference
 
-- Code passes Prettier formatting check: `npx prettier --check .`
-- Code passes TypeScript typecheck: `npx tsc --noEmit`
-- Code passes ESLint: `npx expo lint`
+### 6. Component Quality
 
-## 2. Review Output Format
+- [ ] Component renders correctly with empty / undefined / null data
+- [ ] Touch targets meet 44pt minimum
+- [ ] Colors sourced from `useTheme()`, not hardcoded
+- [ ] Spacing from `Spacing.*` constants, not raw numbers
+- [ ] Barrel export updated in `index.ts` after adding new component
 
-When conducting a code review, report findings organized by severity:
+### 7. State Management
 
-1. 🚨 **Blockers (Critical)**: Crashes, memory leaks, missing error handling, type violations.
-2. ⚠️ **Warnings (Important)**: Performance bottlenecks, missing modularization, un-memoized callbacks in lists.
-3. 💡 **Suggestions (Nice to Have)**: Readability improvements, minor stylistic consistency, micro-interaction polish.
-4. ✅ **Positive Notes**: Highlights of well-structured code, clean decomposition, or excellent typing.
+- [ ] Zustand actions use `set()` correctly (not direct mutation)
+- [ ] Persistence calls wrapped in try/catch
+- [ ] Store slices own exactly one domain (no cross-domain logic)
+
+## Review Output Format
+
+Report as:
+
+```
+BLOCKING   — Must be fixed before merge
+SUGGESTION — Recommend but not blocking
+NITPICK    — Minor style/naming preference
+PRAISE     — Good pattern worth calling out
+```
+
+Example:
+
+```
+BLOCKING: src/features/analysis/cosmeticHeuristics.ts:42 — `any` type on `pixelData` parameter. Use `PixelData` interface from src/types/scan.ts.
+SUGGESTION: src/app/scan/results.tsx — Extract the 60-line result card JSX into src/components/scan/ScanResultCard.tsx.
+NITPICK: src/components/ui/app-button.tsx:15 — Prefer `variant === 'primary'` over nested ternary for readability.
+PRAISE: src/utils/safeStorage.ts — Excellent fallback pattern for Expo Go compatibility.
+```

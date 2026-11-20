@@ -1,48 +1,66 @@
 ---
 name: browser-preview
-description: >-
-  Use this skill to visually test, inspect, and interact with the Expo application in a browser
-  using Antigravity's built-in browser subagent and Chrome DevTools.
+description: Test the Expo web build in a browser using the browser subagent. Use to visually verify UI changes without a physical device or emulator.
 ---
 
-# Browser UI Preview & Verification Skill
-
-This skill integrates Antigravity's built-in `browser` subagent to perform live browser-driven verification of Expo web screens and responsive layouts.
+# Browser Preview Skill
 
 ## When to Use
 
-- Visually inspecting rendered UI components and theme transitions (dark/light mode).
-- Testing user interaction flows (clicking buttons, opening cards, navigating between tabs).
-- Auditing browser console logs for warnings, unhandled errors, or missing assets.
-- Checking responsiveness across mobile viewport presets (e.g. 390x844 for iPhone, 412x915 for Pixel).
+- Verify UI layout changes quickly without rebuilding the APK
+- Check that routing works (tab navigation, screen transitions)
+- Spot visual regressions in components
+- Confirm the web platform renders correctly
 
-## Workflow
+> Note: Web platform has some differences from Android/iOS. Camera and native modules behave differently on web.
 
-### 1. Launch Expo Web Dev Server
+## Starting the Dev Server for Web
 
-Start the local server if it is not already running:
+```bash
+# Start with web support
+set EXPO_NO_TELEMETRY=1 && npx expo start --web
 
-```powershell
-npx expo start --web
+# Or export a static build
+set EXPO_NO_TELEMETRY=1 && npx expo export --platform web --output-dir dist-web
 ```
 
-Or start in the background:
+## Using the Browser Subagent
 
-```powershell
-npm run web
+When you need to visually verify the app:
+
+1. Start the Metro dev server on `localhost:8081`
+2. Delegate to the browser subagent with:
+
+```
+Open http://localhost:8081 in the browser.
+Navigate to [specific screen].
+Verify: [describe what to check].
+Report back: does the layout look correct? Any visual errors or console errors?
 ```
 
-### 2. Delegate to the Built-in `browser` Subagent
+## Expo Web Limitations vs Native
 
-Use the `invoke_subagent` tool with `TypeName: "browser"`:
+| Feature        | Expo Go / Native       | Expo Web               |
+| -------------- | ---------------------- | ---------------------- |
+| Camera         | SafeCamera wrapper     | Not available          |
+| AsyncStorage   | SafeStorage in-memory  | localStorage (native)  |
+| SafeAreaView   | Hardware notch support | CSS padding simulation |
+| Native shadows | `elevation` (Android)  | CSS box-shadow         |
+| Expo Router    | File-based routing     | Same! Works great      |
 
-- **Role**: `Expo Web UI Verifier`
-- **Prompt**: Direct the agent to `http://localhost:8081` (or your active Expo port). Instruct it to:
-  - Take a screenshot of the Home and Profile tabs.
-  - Test button clicks (e.g., "Get Started", "Edit Profile").
-  - Verify that colors match design tokens and no red/yellow error screens appear.
+## Component Check on Web
 
-### 3. Analyze Findings & Auto-Fix
+When a new component is added, verify on web:
 
-- Review visual output and console messages returned by the browser subagent.
-- Immediately fix any layout shifts, broken margins, or failing click handlers.
+- Text renders at correct size
+- Buttons are clickable with correct size
+- Cards render with correct shadows
+- Colors match the design system
+
+## Visual Regression Workflow
+
+1. Start dev server: `npx expo start --web`
+2. Open browser subagent → navigate to `localhost:8081`
+3. Walk through tabs: Home → Routine → Profile
+4. Navigate to scan flow: `/scan/camera` → `/scan/processing` → `/scan/results`
+5. Report any layout issues

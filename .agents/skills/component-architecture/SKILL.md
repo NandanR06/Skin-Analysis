@@ -1,74 +1,124 @@
 ---
 name: component-architecture
-description: >-
-  Use this skill when structuring, refactoring, or decomposing code into clean, modular,
-  reusable multi-component architectures in Expo and React Native. Enforces atomic design,
-  screen vs component separation, custom hooks, and prop contracts.
+description: Multi-component modular structure for Expo/React Native. Use when creating new features, splitting large screens, or designing reusable UI components.
 ---
 
-# Multi-Component Architecture & Modularity Skill
+# Component Architecture Skill
 
-This skill enforces strict component decomposition and architectural separation of concerns for React Native / Expo projects.
+## Component Classification
 
-## 1. Architectural Directory Layout
+### Level 1 — Primitive UI Components (`src/components/ui/`)
 
-Ensure application code is modularized into distinct layers:
+- Pure, stateless, fully controlled via props
+- No store access, no navigation
+- Fully typed with strict TypeScript props interface
+- Documented with JSDoc
+- Exported via barrel `src/components/ui/index.ts`
 
-```text
-src/
-├── app/                  # Expo Router route definitions ONLY
-│   ├── (tabs)/
-│   │   ├── _layout.tsx   # Tab navigation configuration
-│   │   ├── index.tsx     # Route screen (thin orchestrator)
-│   │   └── profile.tsx   # Route screen (thin orchestrator)
-│   └── _layout.tsx       # Root stack navigation
-├── components/           # Reusable UI components
-│   ├── ui/               # Atomic primitives (Button, Card, Input, Text, Badge, Avatar)
-│   └── composite/        # Domain/feature components composed from primitives
-├── hooks/                # Custom business logic & data hooks (useProfile, useTheme)
-├── constants/            # Theme tokens, layout constants, API config
-├── types/                # Shared TypeScript types and interfaces
-└── utils/                # Pure helper functions and formatters
+```tsx
+interface AppButtonProps {
+  title: string;
+  onPress: () => void;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  style?: StyleProp<ViewStyle>;
+}
+
+export function AppButton({ title, onPress, variant = 'primary', ... }: AppButtonProps) {
+  // ...
+}
 ```
 
-## 2. Separation of Concerns (The Thin Screen Rule)
+### Level 2 — Feature Components (`src/components/<feature>/`)
 
-Route files under `src/app/` must **never** contain hundreds of lines of inline UI, business logic, or complex state.
+- Domain-specific, composed of Level 1 primitives
+- May receive complex typed data objects as props
+- Example: `src/components/scan/ScanResultCard.tsx`
+- Still no store access — data passed from screen
 
-- **Route Screen Responsibility**:
-  1. Retrieve route parameters (`useLocalSearchParams`).
-  2. Invoke domain hooks for data and actions.
-  3. Orchestrate composite components.
-  4. Wire navigation handlers (`router.push`, `router.back`).
-- **Target Size**: Screens should ideally be under **100 lines of code**.
+### Level 3 — Screen Components (`src/app/`)
 
-## 3. Atomic & Reusable Component Standards
+- Expo Router routes — coordinate Level 2 components
+- Access stores with `useXxxStore()`
+- Handle navigation with `router.push()`
+- Keep JSX lean — delegate rendering to Level 2
 
-Every component in `src/components/` must adhere to these rules:
+## File Naming Convention
 
-1. **Explicit TypeScript Interface**:
-   ```tsx
-   export interface ButtonProps {
-     title: string;
-     onPress: () => void;
-     variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-     size?: 'sm' | 'md' | 'lg';
-     disabled?: boolean;
-     loading?: boolean;
-     icon?: React.ReactNode;
-   }
-   ```
-2. **Single Responsibility**: One component per file (with small private sub-primitives allowed if tightly coupled).
-3. **Pure Presentational Where Possible**: Components should receive data and callbacks via props rather than directly coupling to global route state or raw network calls.
-4. **Extract Custom Hooks**: If a screen has multiple `useState`, `useEffect`, or complex calculations, extract them to a dedicated hook:
-   - Example: `src/hooks/useUserProfile.ts` instead of embedding fetching and state logic in `Profile.tsx`.
+- `kebab-case.tsx` for component files
+- `PascalCase` for the exported component function
+- `kebab-case/index.ts` for barrel exports
+- `use-kebab-case.ts` for custom hooks
 
-## 4. Decomposition Checklist for Refactoring Large Files
+## Creating a New Feature Component
 
-When refactoring a large or monolithic screen:
+### Step 1 — Define the TypeScript interface
 
-1. **Identify Primitives**: Extract reusable elements (Cards, Headers, List Items, Buttons) into `src/components/ui/` or `src/components/<feature>/`.
-2. **Extract Business Logic**: Move state management, validation, and async operations into `src/hooks/`.
-3. **Move Theme Values**: Extract hardcoded colors, padding, and font sizes into `src/constants/theme.ts`.
-4. **Define Types**: Place interfaces for data models and component props into `src/types/`.
-5. **Re-assemble Screen**: Replace monolithic code in `src/app/` with clean composition of your modular components.
+```ts
+// src/types/scan.ts (or inline in component for small components)
+export interface ScanResultCardProps {
+  report: SkinAnalysisReport;
+  onViewDetails: () => void;
+}
+```
+
+### Step 2 — Create the component file
+
+```
+src/components/scan/scan-result-card.tsx
+```
+
+### Step 3 — Compose from primitives
+
+```tsx
+import { AppCard, AppText, AppButton, AppProgressBar } from '../ui';
+
+export function ScanResultCard({ report, onViewDetails }: ScanResultCardProps) {
+  return (
+    <AppCard elevated>
+      <AppText variant="h2">{report.summaryObservations.primaryFocus}</AppText>
+      <AppProgressBar value={report.overallScore} max={100} />
+      <AppButton title="View Details" onPress={onViewDetails} variant="outline" size="sm" />
+    </AppCard>
+  );
+}
+```
+
+### Step 4 — Export from feature barrel
+
+```ts
+// src/components/scan/index.ts
+export * from './scan-result-card';
+```
+
+### Step 5 — Use in screen
+
+```tsx
+// src/app/scan/results.tsx
+import { ScanResultCard } from '../../components/scan';
+```
+
+## Component Composition Rules
+
+- Max **3 props** passed more than 2 levels deep → use context or store
+- Component renders only what it receives — no internal data fetching
+- Error states: show fallback UI, never crash
+- Loading states: use skeleton or placeholder, never undefined renders
+
+## This Project's Component Inventory
+
+```
+src/components/
+  ui/
+    app-text.tsx        ← Typography
+    app-button.tsx      ← Interactive button
+    app-card.tsx        ← Card container
+    app-badge.tsx       ← Status chip
+    app-progress.tsx    ← Progress bar
+    metric-card.tsx     ← Single metric display
+    face-guide-overlay.tsx ← Camera overlay
+    index.ts            ← Barrel export
+  camera/
+    SafeCamera.tsx      ← Native module safe wrapper
+```

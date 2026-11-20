@@ -1,97 +1,130 @@
 ---
 name: mobile-testing
-description: >-
-  Use this skill to configure, write, and execute unit, component, and hook tests for Expo
-  and React Native applications using Jest and React Native Testing Library.
+description: Testing strategy for this Expo app using jest-expo and React Native Testing Library. Unit tests for features, hook tests, component render tests, and store tests.
 ---
 
-# Mobile Testing & Test-Driven Skill
+# Mobile Testing Skill
 
-This skill guides the implementation and execution of reliable unit and component tests for React Native and Expo applications.
+## Test Stack
 
-## 1. Testing Stack & Setup
+- **jest-expo**: Pre-configured Jest preset for Expo (already in devDependencies)
+- **@testing-library/react-native**: Component testing
+- **@testing-library/jest-native**: Custom matchers (`.toBeVisible()`, `.toHaveTextContent()`)
 
-- **Runner**: `jest` with `jest-expo` preset.
-- **Component Testing**: `@testing-library/react-native`.
-- **User Interactions**: `@testing-library/react-native` `userEvent` or `fireEvent`.
+## Running Tests
 
-### Typical `package.json` Test Configuration:
-
-```json
-{
-  "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
-  },
-  "jest": {
-    "preset": "jest-expo",
-    "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
-    ],
-    "setupFilesAfterEnv": ["@testing-library/jest-native/extend-expect"]
-  }
-}
+```bash
+npx jest                    # All tests
+npx jest --watch            # Watch mode
+npx jest src/features       # Specific folder
+npx jest --coverage         # Coverage report
+npx jest -t "analyzeShine"  # Specific test name
 ```
 
-## 2. Component Testing Patterns
+## Test File Locations
 
-Focus on testing component behavior from the user's perspective, avoiding testing internal implementation details.
-
-### Example: Testing a Button Component
-
-```tsx
-import { render, screen, fireEvent } from '@testing-library/react-native';
-import { Button } from '@/components/ui/button';
-
-describe('Button', () => {
-  it('renders title correctly and triggers onPress', () => {
-    const handlePress = jest.fn();
-    render(<Button title="Submit" onPress={handlePress} />);
-
-    const buttonElement = screen.getByText('Submit');
-    expect(buttonElement).toBeTruthy();
-
-    fireEvent.press(buttonElement);
-    expect(handlePress).toHaveBeenCalledTimes(1);
-  });
-
-  it('disables press events when disabled prop is true', () => {
-    const handlePress = jest.fn();
-    render(<Button title="Disabled" onPress={handlePress} disabled />);
-
-    const buttonElement = screen.getByText('Disabled');
-    fireEvent.press(buttonElement);
-    expect(handlePress).not.toHaveBeenCalled();
-  });
-});
+```
+src/
+  features/
+    analysis/__tests__/cosmeticHeuristics.test.ts
+    recommendations/__tests__/routineBuilder.test.ts
+  hooks/__tests__/use-theme.test.ts
+  components/ui/__tests__/AppButton.test.tsx
+  store/__tests__/useScanStore.test.ts
 ```
 
-## 3. Testing Custom Hooks
+## Unit Tests — Feature Logic (Highest Priority)
 
-Use `renderHook` and `act` from `@testing-library/react-native`:
+Feature files in `src/features/` are pure TypeScript functions — test them thoroughly:
 
-```tsx
-import { renderHook, act } from '@testing-library/react-native';
-import { useCounter } from '@/hooks/useCounter';
+```ts
+import { buildRoutine } from '../routineBuilder';
 
-describe('useCounter', () => {
-  it('increments counter value', () => {
-    const { result } = renderHook(() => useCounter(0));
-    expect(result.current.count).toBe(0);
+describe('buildRoutine', () => {
+  const mockProfile = {
+    skinType: 'oily',
+    concerns: ['shine', 'redness'],
+    sensitivities: [],
+  };
 
-    act(() => {
-      result.current.increment();
+  it('includes niacinamide for oily skin', () => {
+    const routine = buildRoutine(mockProfile, { overallScore: 65 });
+    const ingredients = routine.morning.map(step => step.ingredient);
+    expect(ingredients).toContain('Niacinamide');
+  });
+
+  it('excludes potential irritants for sensitive skin', () => {
+    const sensitiveProfile = { ...mockProfile, sensitivities: ['fragrance'] };
+    const routine = buildRoutine(sensitiveProfile, { overallScore: 65 });
+    routine.morning.forEach(step => {
+      expect(step.ingredient).not.toBe('Fragrance');
     });
-
-    expect(result.current.count).toBe(1);
   });
 });
 ```
 
-## 4. Best Practices Checklist
+## Store Tests
 
-- [ ] Query elements using user-facing roles and labels (`getByRole`, `getByLabelText`, `getByText`) before fallback test IDs.
-- [ ] Mock native modules (`expo-router`, `react-native-reanimated`, safe area insets) properly in setup files.
-- [ ] Ensure all asynchronous updates are wrapped in `act()` or handled with `waitFor`.
-- [ ] Run `npm test` before committing to ensure regression-free code.
+```ts
+import { renderHook, act } from '@testing-library/react-native';
+import { useScanStore } from '../useScanStore';
+
+describe('useScanStore', () => {
+  beforeEach(() => {
+    useScanStore.getState().reset?.();
+  });
+
+  it('sets currentReport after scan', () => {
+    const { result } = renderHook(() => useScanStore());
+    act(() => {
+      result.current.setCurrentReport(mockReport);
+    });
+    expect(result.current.currentReport?.overallScore).toBe(mockReport.overallScore);
+  });
+});
+```
+
+## Component Tests
+
+```tsx
+import { render, fireEvent } from '@testing-library/react-native';
+import { AppButton } from '../app-button';
+
+it('calls onPress when tapped', () => {
+  const handler = jest.fn();
+  const { getByText } = render(<AppButton title="Scan" onPress={handler} />);
+  fireEvent.press(getByText('Scan'));
+  expect(handler).toHaveBeenCalledOnce();
+});
+```
+
+## Mock Setup — `jest.setup.ts`
+
+```ts
+// Mock AsyncStorage (not available in Expo Go / test env)
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
+
+// Mock expo-camera
+jest.mock('expo-camera', () => ({
+  CameraView: 'CameraView',
+  useCameraPermissions: () => [{ granted: true }, jest.fn()],
+}));
+
+// Mock expo-router
+jest.mock('expo-router', () => ({
+  router: { push: jest.fn(), back: jest.fn(), replace: jest.fn() },
+  useLocalSearchParams: () => ({}),
+}));
+```
+
+## Coverage Targets
+
+| Layer                | Target                       |
+| -------------------- | ---------------------------- |
+| `src/features/`      | 80%+                         |
+| `src/store/`         | 70%+                         |
+| `src/components/ui/` | 60%+                         |
+| `src/hooks/`         | 60%+                         |
+| `src/app/`           | 30%+ (integration preferred) |
