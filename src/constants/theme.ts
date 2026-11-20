@@ -1,50 +1,69 @@
-// ─── Light-only palette — dark mode is intentionally disabled ───────────────
-// Aesthetic: Clean clinical-spa — white surfaces, sage green accents,
-// warm rose/amber indicators, generous whitespace.
+// ─── FaceScan AI Theme & Color Tokens ──────────────────────────────────────────
+// Aesthetic: Clinical-luxury biometric wellness — warm ivory/sand background,
+// obsidian navy primary elements, vibrant indigo/violet telemetry accents,
+// soft lavender chips, and crisp white cards.
 
 export const Colors = {
   light: {
     // Backgrounds
-    background: '#F7F9F8', // Very light sage tint
+    background: '#FAF8F5', // Warm ivory/cream background from reference
     surface: '#FFFFFF',
     surfaceElevated: '#FFFFFF',
-    surfaceTint: '#EEF5F1', // Subtle green tint for section backgrounds
+    surfaceTint: '#F3E8FF', // Soft lavender tint
+    warmTint: '#FAF7F0', // Sand/warm cream subcard tint
 
     // Text hierarchy
-    text: '#0F2419', // Deep forest — highest contrast
-    textSecondary: '#4A6358', // Sage-tinted grey
-    textMuted: '#8FA89E', // Muted green-grey
+    text: '#0B132B', // Deep obsidian navy for high-contrast headings
+    textSecondary: '#64748B', // Slate grey for secondary labels & descriptions
+    textMuted: '#94A3B8', // Muted slate
 
-    // Brand greens
-    primary: '#1A6B4A', // Deep botanical green
-    primaryLight: '#D4EDE0', // Very light green for tinted surfaces
+    // Brand & UI Accents
+    primary: '#0B132B', // Deep obsidian navy button & dark elements
+    primaryNavy: '#0B132B',
+    primaryLight: '#EDE9FE',
     primaryForeground: '#FFFFFF',
-    secondary: '#E8F4ED', // Soft mint card background
-    secondaryForeground: '#1A6B4A',
+    secondary: '#EEF2FF', // Soft indigo tint
+    secondaryForeground: '#4F46E5',
 
-    // Accents
-    accent: '#24936A',
-    accentRose: '#D4635A', // Redness indicator
-    accentAmber: '#C87941', // Glow / warmth indicator
-    accentCyan: '#2B8C80', // Hydration indicator
-    accentSage: '#7DAA94', // Softer green for decorative elements
+    // Accents matching FaceScan AI telemetry
+    accentIndigo: '#4F46E5',
+    accentViolet: '#7C3AED',
+    accentPurple: '#6366F1',
+    accentBlue: '#3B82F6',
+    accentCyan: '#06B6D4',
+    badgeLavender: '#F3E8FF',
+    badgeLavenderText: '#7C3AED',
+    badgePurple: '#EDE9FE',
+    badgePurpleText: '#6366F1',
+    badgeGray: '#F1F5F9',
+    badgeGrayText: '#475569',
+    alertBg: '#FAF5FF',
+    alertBorder: '#EDE9FE',
+
+    // Botanical / Legacy aliases for compatibility
+    accent: '#4F46E5',
+    accentRose: '#D4635A',
+    accentAmber: '#C87941',
+    accentCyanLegacy: '#2B8C80',
+    accentSage: '#7DAA94',
 
     // Surfaces & Borders
-    border: '#DDE9E3',
-    borderSubtle: '#EEF5F1',
+    border: '#F1EFEA',
+    borderSubtle: '#F8F6F1',
     card: '#FFFFFF',
-    cardBorder: '#E5EFEA',
+    cardBorder: '#F1EFEA',
 
     // Tab bar
-    tint: '#1A6B4A',
-    tabIconDefault: '#A0BAB1',
-    tabIconSelected: '#1A6B4A',
+    tint: '#0B132B',
+    tabIconDefault: '#64748B',
+    tabIconSelected: '#0B132B',
+    tabActiveBg: '#EEF2FF',
 
     // Semantic
-    success: '#1A9E6A',
-    warning: '#D97706',
+    success: '#10B981',
+    warning: '#F59E0B',
     error: '#DC2626',
-    info: '#0C7ABF',
+    info: '#3B82F6',
   },
 } as const;
 
@@ -61,10 +80,12 @@ export const Spacing = {
 } as const;
 
 export const Radii = {
+  xs: 6,
   sm: 8,
   md: 14,
   lg: 20,
-  xl: 28,
+  xl: 24,
+  '2xl': 28,
   pill: 9999,
 } as const;
 
@@ -83,7 +104,7 @@ export const Typography = {
   },
   h2: {
     fontSize: 18,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     lineHeight: 24,
   },
   h3: {
@@ -116,23 +137,23 @@ export const Typography = {
 
 export const Shadow = {
   sm: {
-    shadowColor: '#0F2419',
+    shadowColor: '#0B132B',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.04,
     shadowRadius: 6,
     elevation: 2,
   },
   md: {
-    shadowColor: '#0F2419',
+    shadowColor: '#0B132B',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.06,
     shadowRadius: 12,
     elevation: 4,
   },
   lg: {
-    shadowColor: '#0F2419',
+    shadowColor: '#0B132B',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 20,
     elevation: 8,
   },

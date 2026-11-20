@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { Radii, Spacing, Colors } from '@/constants/theme';
+import { Radii, Colors } from '@/constants/theme';
 import { AppText } from './app-text';
 
 const C = Colors.light;

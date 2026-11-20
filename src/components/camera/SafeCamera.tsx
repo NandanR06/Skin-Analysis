@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { requireOptionalNativeModule } from 'expo-modules-core';
 
 // Check if the native ExpoCamera module was compiled into this APK
@@ -29,6 +29,14 @@ interface SafeCameraProps {
   children?: React.ReactNode;
 }
 
+let CameraViewComponent: any = null;
+if (isNativeCameraAvailable) {
+  try {
+    const expoCamera = require('expo-camera');
+    CameraViewComponent = expoCamera.CameraView;
+  } catch {}
+}
+
 export const SafeCamera = forwardRef<SafeCameraRef, SafeCameraProps>(
   ({ facing, style, children }, ref) => {
     const internalRef = useRef<any>(null);
@@ -42,22 +50,17 @@ export const SafeCamera = forwardRef<SafeCameraRef, SafeCameraProps>(
       },
     }));
 
-    if (!isNativeCameraAvailable) {
+    if (!isNativeCameraAvailable || !CameraViewComponent) {
       // Native module not linked in current APK
       return <View style={style}>{children}</View>;
     }
 
-    try {
-      // Only require expo-camera if native module is confirmed present
-      const { CameraView } = require('expo-camera');
-      return (
-        <CameraView ref={internalRef} facing={facing} style={style}>
-          {children}
-        </CameraView>
-      );
-    } catch (err) {
-      console.warn('ExpoCamera failed to mount', err);
-      return <View style={style}>{children}</View>;
-    }
+    return (
+      <CameraViewComponent ref={internalRef} facing={facing} style={style}>
+        {children}
+      </CameraViewComponent>
+    );
   },
 );
+
+SafeCamera.displayName = 'SafeCamera';

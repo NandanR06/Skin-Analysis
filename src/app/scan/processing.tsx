@@ -24,21 +24,6 @@ export default function ProcessingScreen() {
   const { setCurrentReport, saveCurrentReportToHistory, currentReport } = useScanStore();
   const [stepIndex, setStepIndex] = useState(0);
 
-  useEffect(() => {
-    let currentStep = 0;
-    const interval = setInterval(() => {
-      currentStep += 1;
-      if (currentStep < PROCESSING_STEPS.length) {
-        setStepIndex(currentStep);
-      } else {
-        clearInterval(interval);
-        finalizeAnalysis();
-      }
-    }, 600);
-
-    return () => clearInterval(interval);
-  }, []);
-
   const finalizeAnalysis = async () => {
     let report = currentReport;
 
@@ -71,6 +56,21 @@ export default function ProcessingScreen() {
     await saveCurrentReportToHistory();
     router.replace('/scan/results');
   };
+
+  useEffect(() => {
+    let currentStep = 0;
+    const interval = setInterval(() => {
+      currentStep += 1;
+      if (currentStep < PROCESSING_STEPS.length) {
+        setStepIndex(currentStep);
+      } else {
+        clearInterval(interval);
+        finalizeAnalysis();
+      }
+    }, 600);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const progress = (stepIndex + 1) / PROCESSING_STEPS.length;
 

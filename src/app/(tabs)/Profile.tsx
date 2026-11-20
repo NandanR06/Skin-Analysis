@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { AppText, AppButton, AppCard, AppBadge } from '@/components/ui';
-import { Spacing, Radii, Colors, Shadow } from '@/constants/theme';
+import { Spacing, Radii, Colors } from '@/constants/theme';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useScanStore } from '@/store/useScanStore';
 

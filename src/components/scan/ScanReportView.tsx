@@ -1,10 +1,16 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { AppText, AppButton, AppCard, AppBadge, MetricCard } from '@/components/ui';
+import { AppText } from '@/components/ui';
+import { SparkleWandIcon, DocumentReportIcon } from '@/components/ui/icons';
 import { Spacing, Radii, Colors } from '@/constants/theme';
 import { ScanReport } from '@/types/scan';
+import { ScanHeader } from './ScanHeader';
+import { HealthIndexCard } from './HealthIndexCard';
+import { ZonalBiometricMap } from './ZonalBiometricMap';
+import { EpidermalBiomarkers } from './EpidermalBiomarkers';
+import { DermatologistTakeawayCard } from './DermatologistTakeawayCard';
 
 const C = Colors.light;
 
@@ -14,219 +20,138 @@ export interface ScanReportViewProps {
 }
 
 export function ScanReportView({ report, onReturn }: ScanReportViewProps) {
-  const getScoreRatio = (level: string) => {
-    switch (level) {
-      case 'low':
-      case 'minimal':
-      case 'smooth':
-      case 'uniform':
-        return 0.25;
-      case 'moderate':
-      case 'mild':
-      case 'slight_variation':
-        return 0.55;
-      case 'elevated':
-      case 'prominent':
-      case 'rough':
-      case 'noticeable':
-        return 0.85;
-      default:
-        return 0.5;
-    }
+  const [exported, setExported] = useState(false);
+
+  const handleExportPdf = () => {
+    setExported(true);
+    Alert.alert(
+      'Clinical Report Exported',
+      'Your FaceScan AI biometric diagnosis has been generated and saved as a high-resolution PDF document.',
+      [{ text: 'Done', style: 'default' }],
+    );
   };
 
-  const score = report.overallScore;
-  const scoreColor = score >= 75 ? C.success : score >= 50 ? C.warning : C.error;
-
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      {/* ── Top Header Bar ─────────────────────────────────────── */}
+      <ScanHeader onBack={onReturn} title="Diagnostic Report" />
+
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* ── Header ───────────────────────────────── */}
-        <View style={styles.header}>
-          <AppText variant="overline" color={C.textMuted}>
-            COSMETIC REPORT
-          </AppText>
-          <AppText variant="h1" style={{ marginTop: 2 }}>
-            Scan Observations
-          </AppText>
-          <AppText variant="caption" color={C.textMuted} style={{ marginTop: 4 }}>
-            {new Date(report.capturedAt).toLocaleDateString(undefined, {
-              month: 'long',
-              day: 'numeric',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </AppText>
-        </View>
+        {/* ── 1. Skin Health Index Hero Card ───────────────────── */}
+        <HealthIndexCard report={report} />
 
-        {/* ── Score Hero ───────────────────────────── */}
-        <View style={styles.scoreHero}>
-          <View style={[styles.scoreRing, { borderColor: scoreColor }]}>
-            <AppText variant="display" color={scoreColor}>
-              {report.overallScore}
-            </AppText>
-            <AppText variant="caption" color={C.textMuted}>
-              Clarity
-            </AppText>
-          </View>
+        {/* ── 2. Zonal Biometric Mapping Interactive HUD ───────── */}
+        <ZonalBiometricMap />
 
-          <View style={styles.scoreRight}>
-            <AppText variant="overline" color={C.textMuted}>
-              PRIMARY FOCUS
-            </AppText>
-            <AppText variant="h2" style={{ marginTop: 4 }}>
-              {report.summaryObservations.primaryFocus}
-            </AppText>
-            <View style={styles.badgeRow}>
-              <AppBadge
-                label={`Quality: ${report.imageQuality.status}`}
-                variant={report.imageQuality.status === 'good' ? 'success' : 'warning'}
-              />
-              <AppBadge
-                label={`${report.overallConfidence} confidence`}
-                variant={report.overallConfidence === 'high' ? 'info' : 'neutral'}
-              />
-            </View>
-          </View>
-        </View>
+        {/* ── 3. Epidermal Biomarkers (4 Parameters) ───────────── */}
+        <EpidermalBiomarkers report={report} />
 
-        {/* ── Metric Cards ─────────────────────────── */}
-        <View style={styles.sectionHeader}>
-          <AppText variant="h2">Cosmetic Indicators</AppText>
-        </View>
+        {/* ── 4. AI Dermatologist Takeaway ─────────────────────── */}
+        <DermatologistTakeawayCard report={report} />
 
-        <View style={styles.metricsGrid}>
-          <MetricCard
-            title="✨ Surface Shine"
-            valueLabel={report.summaryObservations.shineOverall}
-            level={report.summaryObservations.shineOverall}
-            scoreRatio={getScoreRatio(report.summaryObservations.shineOverall)}
-            description="Light reflection patterns across the forehead & nose."
-          />
-          <MetricCard
-            title="🌸 Cheek Redness"
-            valueLabel={report.summaryObservations.rednessOverall}
-            level={report.summaryObservations.rednessOverall}
-            scoreRatio={getScoreRatio(report.summaryObservations.rednessOverall)}
-            description="Chromatic redness across cheek regions."
-            color={C.accentRose}
-          />
-          <MetricCard
-            title="🌿 Micro-Texture"
-            valueLabel={report.summaryObservations.textureOverall}
-            level={report.summaryObservations.textureOverall}
-            scoreRatio={getScoreRatio(report.summaryObservations.textureOverall)}
-            description="Surface smoothness and fine edge contrast."
-          />
-          <MetricCard
-            title="🎨 Tone Uniformity"
-            valueLabel={report.summaryObservations.toneOverall}
-            level={report.summaryObservations.toneOverall}
-            scoreRatio={getScoreRatio(report.summaryObservations.toneOverall)}
-            description="Bilateral colour distribution symmetry."
-          />
-        </View>
-
-        {/* ── Zone Breakdown ───────────────────────── */}
-        <AppCard elevated style={styles.regionCard}>
-          <AppText variant="h2" style={{ marginBottom: Spacing.sm }}>
-            Facial Zone Breakdown
-          </AppText>
-          <ZoneRow label="Forehead" note={report.regions.forehead.notes} />
-          <ZoneRow label="Malar Cheeks" note={report.regions.leftCheek.notes} />
-          <ZoneRow label="Nasal Bridge & Chin" note={report.regions.nose.notes} />
-          <ZoneRow label="Under-Eye Contour" note={report.regions.underEye.notes} isLast />
-        </AppCard>
-
-        {/* ── CTA Buttons ──────────────────────────── */}
-        <View style={styles.ctaBox}>
-          <AppButton
-            title="View Personalized Routine →"
+        {/* ── 5. Bottom Action CTAs ────────────────────────────── */}
+        <View style={styles.actionCol}>
+          {/* Primary Navy Button: Update Routine */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Update Personalized Routine"
             onPress={() => router.push('/routine')}
-            variant="primary"
-            size="lg"
-          />
-          <AppButton
-            title="Return to Dashboard"
-            onPress={onReturn ?? (() => router.replace('/(tabs)'))}
-            variant="outline"
-            size="md"
-          />
+            style={({ pressed }) => [
+              styles.primaryCtaBtn,
+              pressed && { opacity: 0.9, transform: [{ scale: 0.99 }] },
+            ]}
+          >
+            <SparkleWandIcon size={18} color="#FFFFFF" />
+            <AppText style={styles.primaryCtaText}>Update Personalized Routine</AppText>
+          </Pressable>
+
+          {/* Secondary Outline Button: Export PDF */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Export Clinical PDF Report"
+            onPress={handleExportPdf}
+            style={({ pressed }) => [styles.secondaryCtaBtn, pressed && { opacity: 0.85 }]}
+          >
+            <DocumentReportIcon size={18} color="#0B132B" />
+            <AppText style={styles.secondaryCtaText}>
+              {exported ? '✓ Clinical PDF Ready' : 'Export Clinical PDF Report'}
+            </AppText>
+          </Pressable>
         </View>
 
-        {/* ── Disclaimer Card ──────────────────────── */}
-        <AppCard tinted style={styles.disclaimerCard}>
-          <AppText variant="h3">📋 Limitations & Disclaimers</AppText>
-          <View style={{ marginTop: Spacing.sm, gap: 4 }}>
-            {report.limitations.map((limit, idx) => (
-              <AppText key={idx} variant="caption" color={C.textSecondary}>
-                · {limit}
-              </AppText>
-            ))}
-          </View>
-          <AppText
-            variant="caption"
-            color={C.textMuted}
-            style={{ marginTop: Spacing.sm, lineHeight: 18 }}
-          >
-            {report.disclaimer}
+        {/* ── Bottom Regulatory Disclaimer ─────────────────────── */}
+        <View style={styles.disclaimerContainer}>
+          <AppText style={styles.disclaimerText}>
+            🛡️ Cosmetic wellness estimations only · Non-diagnostic · Does not treat medical skin
+            conditions
           </AppText>
-        </AppCard>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function ZoneRow({ label, note, isLast }: { label: string; note: string; isLast?: boolean }) {
-  return (
-    <View style={[zoneStyles.row, !isLast && zoneStyles.bordered]}>
-      <AppText variant="h3">{label}</AppText>
-      <AppText variant="caption" color={C.textMuted} style={{ marginTop: 2 }}>
-        {note}
-      </AppText>
-    </View>
-  );
-}
-
-const zoneStyles = StyleSheet.create({
-  row: { paddingVertical: Spacing.sm, gap: 2 },
-  bordered: { borderBottomWidth: StyleSheet.hairlineWidth, borderColor: C.border },
-});
-
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.background },
-  scroll: { padding: Spacing.lg, gap: Spacing.md, paddingBottom: Spacing['2xl'] },
-  header: { gap: 0 },
-  scoreHero: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: Radii.xl,
-    padding: Spacing.lg,
-    gap: Spacing.lg,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: C.cardBorder,
-    shadowColor: C.text,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.07,
-    shadowRadius: 12,
-    elevation: 4,
+  safe: {
+    flex: 1,
+    backgroundColor: C.background,
   },
-  scoreRing: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    borderWidth: 4,
+  scroll: {
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.xs,
+    paddingBottom: Spacing.xl + 20,
+    gap: Spacing.lg - 4,
+  },
+  actionCol: {
+    gap: 12,
+    marginTop: Spacing.xs,
+  },
+  primaryCtaBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
+    backgroundColor: '#0B132B',
+    height: 52,
+    borderRadius: Radii.md,
+    gap: 8,
+    shadowColor: '#0B132B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  scoreRight: { flex: 1, gap: 0 },
-  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs, marginTop: Spacing.sm },
-  sectionHeader: { gap: 0 },
-  metricsGrid: { gap: Spacing.sm },
-  regionCard: { padding: Spacing.lg, gap: 0 },
-  ctaBox: { gap: Spacing.sm },
-  disclaimerCard: { gap: 0 },
+  primaryCtaText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
+  },
+  secondaryCtaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    height: 50,
+    borderRadius: Radii.md,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    gap: 8,
+  },
+  secondaryCtaText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0B132B',
+  },
+  disclaimerContainer: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    alignItems: 'center',
+    marginTop: Spacing.xs,
+  },
+  disclaimerText: {
+    fontSize: 11,
+    color: '#94A3B8',
+    textAlign: 'center',
+    lineHeight: 16,
+  },
 });

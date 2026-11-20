@@ -1,258 +1,232 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
+import {
+  DermatologyInsightBanner,
+  PrecisionRecommendationCard,
+  RegimenFlowList,
+  RegimenProgressCard,
+  RegimenStepItem,
+  RoutineHeader,
+  StreakCalendarCard,
+} from '@/components/routine';
+import { AppText } from '@/components/ui';
+import { MoonIcon, SunIcon } from '@/components/ui/icons';
+import { Colors, Radii, Spacing } from '@/constants/theme';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppText, AppButton, AppCard, AppBadge } from '@/components/ui';
-import { Spacing, Radii, Colors, Shadow } from '@/constants/theme';
-import { useScanStore } from '@/store/useScanStore';
-import { useProfileStore } from '@/store/useProfileStore';
-import { buildPersonalizedPlan } from '@/features/recommendations/routineBuilder';
-import { getPresetReport } from '@/features/analysis/sampleScans';
 
 const C = Colors.light;
 
-export default function RoutineScreen() {
-  const { currentReport } = useScanStore();
-  const { profile } = useProfileStore();
-  const [activeTab, setActiveTab] = useState<'AM' | 'PM'>('AM');
+const INITIAL_AM_STEPS: RegimenStepItem[] = [
+  {
+    id: 'step_1',
+    stepNum: 'STEP 01',
+    category: 'CLEANSE',
+    timeTag: '08:16 AM',
+    title: 'Gentle Amino Foaming Cleanser',
+    description: 'Balanced pH 5.5 formulation. Preserved skin natural lipids.',
+    chips: [
+      { label: '60s Wash', variant: 'sand' },
+      { label: 'Sebum Cleared', variant: 'lavender' },
+    ],
+    isCompleted: true,
+  },
+  {
+    id: 'step_2',
+    stepNum: 'STEP 02',
+    category: 'TREAT',
+    timeTag: '08:18 AM',
+    title: 'Niacinamide 10% + Zinc Pore Serum',
+    description: 'Calms inflammation & refines T-zone texture.',
+    chips: [
+      { label: '4 Drops', variant: 'sand' },
+      { label: 'Pore Minimizing', variant: 'purple' },
+    ],
+    isCompleted: true,
+  },
+  {
+    id: 'step_3',
+    stepNum: 'STEP 03',
+    category: 'TARGETED SCAN MATCH',
+    timeTag: 'Just now',
+    title: 'Hyaluronic Acid Under-Eye Gel',
+    description: 'Address micro-fatigue detected in peri-orbital telemetry scan.',
+    chips: [
+      { label: 'Scan Match: 96%', variant: 'purple' },
+      { label: 'Tap gently', variant: 'sand' },
+    ],
+    isCompleted: true,
+  },
+  {
+    id: 'step_4',
+    stepNum: 'STEP 04',
+    category: 'SHIELD & PROTECT',
+    timeTag: 'Pending',
+    title: 'Ceramide Barrier Moisturizer SPF 50+',
+    description:
+      'Dual-action protection: ceramides replenish hydration while broad-spectrum PA++++ blocks UV stress.',
+    chips: [{ label: 'UV Shield SPF 50', variant: 'lavender' }],
+    isCompleted: false,
+    actionRequired: true,
+    doseText: 'Nickel sized',
+  },
+];
 
-  const effectiveReport = currentReport ?? getPresetReport('preset_balanced');
-  const plan = buildPersonalizedPlan(effectiveReport, profile);
-  const activeSteps = activeTab === 'AM' ? plan.morningRoutine : plan.eveningRoutine;
+const INITIAL_PM_STEPS: RegimenStepItem[] = [
+  {
+    id: 'pm_step_1',
+    stepNum: 'STEP 01',
+    category: 'DOUBLE CLEANSE',
+    timeTag: '08:30 PM',
+    title: 'Micellar Oil Balm & Gentle Wash',
+    description: 'Dissolves daily sunscreen and environmental particulates completely.',
+    chips: [{ label: 'Gentle Massage', variant: 'sand' }],
+    isCompleted: false,
+    actionRequired: true,
+    doseText: 'Dime sized',
+  },
+  {
+    id: 'pm_step_2',
+    stepNum: 'STEP 02',
+    category: 'CELLULAR RENEWAL',
+    timeTag: '08:35 PM',
+    title: 'Encapsulated Retinal 0.05% Emulsion',
+    description: 'Promotes micro-collagen matrix synthesis without surface erythema.',
+    chips: [{ label: '1 Pump', variant: 'purple' }],
+    isCompleted: false,
+  },
+  {
+    id: 'pm_step_3',
+    stepNum: 'STEP 03',
+    category: 'BARRIER LOCK',
+    timeTag: '08:40 PM',
+    title: 'Lipid Replenishing Night Recovery Cream',
+    description: 'Fortifies transepidermal water barrier overnight during sleep cycles.',
+    chips: [{ label: 'Night Lock', variant: 'lavender' }],
+    isCompleted: false,
+  },
+];
+
+export default function RoutineScreen() {
+  const [activeTab, setActiveTab] = useState<'AM' | 'PM'>('AM');
+  const [amSteps, setAmSteps] = useState<RegimenStepItem[]>(INITIAL_AM_STEPS);
+  const [pmSteps, setPmSteps] = useState<RegimenStepItem[]>(INITIAL_PM_STEPS);
+
+  const currentSteps = activeTab === 'AM' ? amSteps : pmSteps;
+  const completedCount = currentSteps.filter(s => s.isCompleted).length;
+
+  const handleToggleStep = (stepId: string) => {
+    if (activeTab === 'AM') {
+      setAmSteps(prev =>
+        prev.map(step => (step.id === stepId ? { ...step, isCompleted: !step.isCompleted } : step)),
+      );
+    } else {
+      setPmSteps(prev =>
+        prev.map(step => (step.id === stepId ? { ...step, isCompleted: !step.isCompleted } : step)),
+      );
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* ── Header ───────────────────────────────── */}
-        <View style={styles.header}>
-          <AppText variant="overline" color={C.textMuted}>
-            TARGETED REGIMEN
-          </AppText>
-          <AppText variant="h1" style={{ marginTop: 2 }}>
-            Daily Routine
-          </AppText>
-          <AppText variant="body" color={C.textSecondary} style={{ marginTop: 4 }}>
-            {plan.summary}
-          </AppText>
-        </View>
+        {/* ── Top Bar Header (Logo + Routine Label + Scan + Avatar) ── */}
+        <RoutineHeader />
 
-        {/* ── AM / PM Toggle ───────────────────────── */}
-        <View style={styles.toggle}>
-          <Pressable
-            onPress={() => setActiveTab('AM')}
-            style={[styles.toggleBtn, activeTab === 'AM' && styles.toggleActive]}
-          >
-            <AppText variant="h3" color={activeTab === 'AM' ? C.primary : C.textMuted}>
-              ☀️ Morning
-            </AppText>
-          </Pressable>
-          <Pressable
-            onPress={() => setActiveTab('PM')}
-            style={[styles.toggleBtn, activeTab === 'PM' && styles.toggleActive]}
-          >
-            <AppText variant="h3" color={activeTab === 'PM' ? C.primary : C.textMuted}>
-              🌙 Evening
-            </AppText>
-          </Pressable>
-        </View>
+        {/* ── 1. 5-Day Glow Streak & Weekly Calendar ───────────── */}
+        <StreakCalendarCard />
 
-        {/* ── Routine Steps ─────────────────────────── */}
-        <View style={styles.stepList}>
-          {activeSteps.map((step, idx) => (
-            <View key={step.stepNumber} style={styles.stepRow}>
-              {/* timeline line */}
-              {idx < activeSteps.length - 1 && <View style={styles.timeline} />}
-
-              {/* step number bubble */}
-              <View style={[styles.stepNumBubble, { backgroundColor: C.primary }]}>
-                <AppText variant="caption" color="#FFFFFF" style={{ fontWeight: '800' }}>
-                  {step.stepNumber}
-                </AppText>
-              </View>
-
-              {/* step content */}
-              <AppCard elevated style={styles.stepCard}>
-                <View style={styles.stepCardHeader}>
-                  <View style={{ flex: 1 }}>
-                    <AppBadge label={step.category} variant="info" />
-                    <AppText variant="h3" style={{ marginTop: 6 }}>
-                      {step.productName}
-                    </AppText>
-                  </View>
-                </View>
-
-                {/* Key ingredient highlight */}
-                <View style={styles.ingBox}>
-                  <AppText variant="caption" color={C.textMuted}>
-                    KEY ACTIVE
-                  </AppText>
-                  <AppText variant="body" color={C.primary} style={{ fontWeight: '700' }}>
-                    {step.heroIngredient}
-                  </AppText>
-                </View>
-
-                <View style={styles.infoBlock}>
-                  <AppText variant="caption" color={C.textMuted} style={styles.infoLabel}>
-                    Why selected
-                  </AppText>
-                  <AppText variant="body">{step.whyRecommended}</AppText>
-                </View>
-
-                <View style={styles.infoBlock}>
-                  <AppText variant="caption" color={C.textMuted} style={styles.infoLabel}>
-                    How to apply
-                  </AppText>
-                  <AppText variant="body">{step.howToApply}</AppText>
-                </View>
-
-                {step.cautions ? (
-                  <View style={styles.cautionBox}>
-                    <AppText variant="caption" color={C.warning} style={{ fontWeight: '700' }}>
-                      ⚠️ {step.cautions}
-                    </AppText>
-                  </View>
-                ) : null}
-              </AppCard>
-            </View>
-          ))}
-        </View>
-
-        {/* ── Recommended Ingredients ───────────────── */}
-        <View style={styles.sectionHeader}>
-          <AppText variant="h2">Recommended Ingredients</AppText>
-          <AppText variant="body" color={C.textMuted} style={{ marginTop: 4 }}>
-            Active compounds tailored to your skin observations
-          </AppText>
-        </View>
-
-        <View style={styles.ingGrid}>
-          {plan.recommendedIngredients.map(ing => (
-            <AppCard key={ing.id} style={styles.ingCard}>
-              <View style={styles.ingHeader}>
-                <AppText variant="h3">{ing.name}</AppText>
-                <AppBadge label={ing.safeFrequency} variant="neutral" />
-              </View>
+        {/* ── 2. Morning (AM) vs Evening (PM) Toggle Pill ──────── */}
+        <View style={styles.toggleWrapper}>
+          <View style={styles.toggleContainer}>
+            <Pressable
+              accessibilityRole="tab"
+              accessibilityState={{ selected: activeTab === 'AM' }}
+              onPress={() => setActiveTab('AM')}
+              style={[styles.toggleBtn, activeTab === 'AM' && styles.toggleBtnActive]}
+            >
+              <SunIcon size={16} color={activeTab === 'AM' ? '#FFFFFF' : '#475569'} />
               <AppText
-                variant="caption"
-                color={C.primary}
-                style={{ fontWeight: '600', marginTop: 2 }}
+                style={[styles.toggleBtnText, activeTab === 'AM' && styles.toggleBtnTextActive]}
               >
-                {ing.cosmeticRole}
+                Morning (AM)
               </AppText>
-              <View style={{ marginTop: Spacing.xs, gap: 2 }}>
-                {ing.benefits.map((b, idx) => (
-                  <AppText key={idx} variant="caption" color={C.textSecondary}>
-                    · {b}
-                  </AppText>
-                ))}
-              </View>
-            </AppCard>
-          ))}
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="tab"
+              accessibilityState={{ selected: activeTab === 'PM' }}
+              onPress={() => setActiveTab('PM')}
+              style={[styles.toggleBtn, activeTab === 'PM' && styles.toggleBtnActive]}
+            >
+              <MoonIcon size={16} color={activeTab === 'PM' ? '#FFFFFF' : '#475569'} />
+              <AppText
+                style={[styles.toggleBtnText, activeTab === 'PM' && styles.toggleBtnTextActive]}
+              >
+                Evening (PM)
+              </AppText>
+            </Pressable>
+          </View>
         </View>
 
-        {/* ── Safety Card ───────────────────────────── */}
-        <AppCard tinted style={styles.safetyCard}>
-          <AppText variant="h3">🛡️ Safe Skincare Guidelines</AppText>
-          <AppText
-            variant="body"
-            color={C.textSecondary}
-            style={{ marginTop: Spacing.sm, lineHeight: 20 }}
-          >
-            {plan.patchTestGuide}
-          </AppText>
-          <View style={{ marginTop: Spacing.sm, gap: 4 }}>
-            {plan.cautionaryNotes.map((note, idx) => (
-              <AppText key={idx} variant="caption" color={C.textSecondary}>
-                · {note}
-              </AppText>
-            ))}
-          </View>
-        </AppCard>
+        {/* ── 3. Regimen Progress Card (3/4 Steps, 75%) ────────── */}
+        <RegimenProgressCard completedSteps={completedCount} totalSteps={currentSteps.length} />
+
+        {/* ── 4. Daily Regimen Flow Step Cards ─────────────────── */}
+        <RegimenFlowList steps={currentSteps} onToggleStep={handleToggleStep} />
+
+        {/* ── 5. Precision Recommendation ──────────────────────── */}
+        <PrecisionRecommendationCard />
+
+        {/* ── 6. Dermatology AI Insight Banner ─────────────────── */}
+        <DermatologyInsightBanner />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: C.background },
-  scroll: { padding: Spacing.lg, gap: Spacing.lg, paddingBottom: Spacing['2xl'] },
-
-  header: { gap: 0 },
-
-  // Toggle
-  toggle: {
+  safe: {
+    flex: 1,
+    backgroundColor: C.background,
+  },
+  scroll: {
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.xs,
+    paddingBottom: Spacing.xl + 20,
+    gap: Spacing.md,
+  },
+  toggleWrapper: {
+    alignItems: 'center',
+    marginVertical: 2,
+  },
+  toggleContainer: {
     flexDirection: 'row',
-    backgroundColor: C.secondary,
-    borderRadius: Radii.lg,
+    backgroundColor: '#FAF7F0',
+    borderRadius: Radii.pill,
     padding: 4,
-    gap: 4,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    width: '100%',
   },
   toggleBtn: {
     flex: 1,
-    paddingVertical: Spacing.sm + 2,
-    alignItems: 'center',
-    borderRadius: Radii.md,
-  },
-  toggleActive: {
-    backgroundColor: '#FFFFFF',
-    ...Shadow.sm,
-  },
-
-  // Steps
-  stepList: { gap: 0 },
-  stepRow: {
     flexDirection: 'row',
-    gap: Spacing.md,
-    marginBottom: Spacing.md,
-    position: 'relative',
-  },
-  timeline: {
-    position: 'absolute',
-    left: 15,
-    top: 36,
-    bottom: -Spacing.md,
-    width: 2,
-    backgroundColor: C.border,
-    zIndex: 0,
-  },
-  stepNumBubble: {
-    width: 32,
-    height: 32,
-    borderRadius: Radii.pill,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Spacing.md,
-    flexShrink: 0,
-    zIndex: 1,
+    gap: 8,
+    paddingVertical: 10,
+    borderRadius: Radii.pill,
   },
-  stepCard: { flex: 1, gap: Spacing.sm, padding: Spacing.md },
-  stepCardHeader: { flexDirection: 'row', alignItems: 'flex-start' },
-  ingBox: {
-    backgroundColor: C.secondary,
-    borderRadius: Radii.sm,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  toggleBtnActive: {
+    backgroundColor: '#0B132B',
   },
-  infoBlock: { gap: 2 },
-  infoLabel: { fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
-  cautionBox: {
-    backgroundColor: '#FEF3C7',
-    borderRadius: Radii.sm,
-    padding: Spacing.sm,
+  toggleBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#475569',
   },
-
-  // Ingredients
-  sectionHeader: { gap: 0 },
-  ingGrid: { gap: Spacing.sm },
-  ingCard: { gap: 0 },
-  ingHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  toggleBtnTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
-
-  // Safety
-  safetyCard: { gap: 0 },
 });
