@@ -656,3 +656,278 @@ export function ReorderIcon({ size = 14, color = '#475569' }: IconProps) {
     </Svg>
   );
 }
+
+// ─── Settings Gear Icon ──────────────────────────────────────────────────────
+export function SettingsGearIcon({ size = 18, color = '#0B132B' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx="12" cy="12" r="3" stroke={color} strokeWidth="2" />
+      <Path
+        d="M19.4 15A1.65 1.65 0 0 0 19.73 16.82L20.08 17.22A2 2 0 1 1 17.25 20.05L16.85 19.7A1.65 1.65 0 0 0 15 19.37A1.65 1.65 0 0 0 13.8 20.9V21.4A2 2 0 1 1 9.8 21.4V20.9A1.65 1.65 0 0 0 8.6 19.37A1.65 1.65 0 0 0 6.75 19.7L6.35 20.05A2 2 0 1 1 3.52 17.22L3.87 16.82A1.65 1.65 0 0 0 3.54 15A1.65 1.65 0 0 0 2 13.8H1.5A2 2 0 1 1 1.5 9.8H2A1.65 1.65 0 0 0 3.54 8.6A1.65 1.65 0 0 0 3.2 6.75L2.85 6.35A2 2 0 1 1 5.68 3.52L6.08 3.87A1.65 1.65 0 0 0 7.9 3.54A1.65 1.65 0 0 0 9.1 2V1.5A2 2 0 1 1 13.1 1.5V2A1.65 1.65 0 0 0 14.3 3.54A1.65 1.65 0 0 0 16.15 3.2L16.55 2.85A2 2 0 1 1 19.38 5.68L19.03 6.08A1.65 1.65 0 0 0 19.36 7.9A1.65 1.65 0 0 0 20.9 9.1H21.4A2 2 0 1 1 21.4 13.1H20.9A1.65 1.65 0 0 0 19.4 15Z"
+        stroke={color}
+        strokeWidth="1.8"
+      />
+    </Svg>
+  );
+}
+
+// ─── Edit Pencil Icon ────────────────────────────────────────────────────────
+export function EditPencilIcon({ size = 18, color = '#0B132B' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 20H21"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M16.5 3.5A2.121 2.121 0 0 1 19.5 6.5L7 19L3 20L4 16L16.5 3.5Z"
+        stroke={color}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+// ─── Verified Badge Icon (Next to name) ──────────────────────────────────────
+export function VerifiedBadgeIcon({ size = 16, color = '#4F46E5' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 2L15.09 3.26L18.16 4.79L19.59 7.77L21.09 10.71L20.48 13.97L19.78 17.21L17.21 19.38L14.47 21.32L11.23 21.39L8.01 21.19L5.59 19L3.4 16.64L3.15 13.39L3.12 10.13L4.93 7.35L6.96 4.74L10.11 3.73L12 2Z"
+        fill={color}
+      />
+      <Path
+        d="M9 12L11 14L15 10"
+        stroke="#FFFFFF"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+// ─── Battery / Power Icon ────────────────────────────────────────────────────
+export function BatteryIcon({ size = 16, color = '#0B132B' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Rect x="2" y="7" width="16" height="10" rx="2" stroke={color} strokeWidth="1.8" />
+      <Path d="M20 11V13" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <Rect x="5" y="10" width="8" height="4" rx="1" fill="#10B981" />
+    </Svg>
+  );
+}
+
+// ─── Stethoscope / Care Team Icon ────────────────────────────────────────────
+export function StethoscopeIcon({ size = 18, color = '#7C3AED' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M4 3V10C4 13.3137 6.68629 16 10 16C13.3137 16 16 13.3137 16 10V3"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <Path
+        d="M10 16V19C10 20.1046 10.8954 21 12 21H16C17.1046 21 18 20.1046 18 19V16"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Circle cx="18" cy="14" r="2.5" fill={color} />
+      <Circle cx="4" cy="3" r="1.5" fill={color} />
+      <Circle cx="16" cy="3" r="1.5" fill={color} />
+    </Svg>
+  );
+}
+
+// ─── Chat Bubble Icon ────────────────────────────────────────────────────────
+export function ChatBubbleIcon({ size = 16, color = '#0B132B' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M21 15A2 2 0 0 1 19 17H7L3 21V5A2 2 0 0 1 5 3H19A2 2 0 0 1 21 5V15Z"
+        stroke={color}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+// ─── Bell Icon (Reminders) ───────────────────────────────────────────────────
+export function BellIcon({ size = 18, color = '#4F46E5' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M18 8A6 6 0 0 0 6 8C6 15 3 17 3 17H21S18 15 18 8Z"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M13.73 21A2 2 0 0 1 10.27 21"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+// ─── Heart Health Icon ───────────────────────────────────────────────────────
+export function HeartIcon({ size = 18, color = '#DC2626' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M20.84 4.61A5.5 5.5 0 0 0 13.16 4.61L12 5.77L10.84 4.61A5.5 5.5 0 0 0 3.16 12.39L12 21.23L20.84 12.39A5.5 5.5 0 0 0 20.84 4.61Z"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+// ─── Lock Shield Icon ────────────────────────────────────────────────────────
+export function LockShieldIcon({ size = 18, color = '#4F46E5' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 22S4 18 4 12V5L12 2L20 5V12C20 18 12 22 12 22Z"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Rect x="9" y="11" width="6" height="5" rx="1" fill={color} />
+      <Path
+        d="M10 11V9C10 7.89543 10.8954 7 12 7C13.1046 7 14 7.89543 14 9V11"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+}
+
+// ─── Download Tray Icon ──────────────────────────────────────────────────────
+export function DownloadIcon({ size = 16, color = '#FFFFFF' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Polyline
+        points="7 10 12 15 17 10"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Line x1="12" y1="15" x2="12" y2="3" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+// ─── Log Out Icon ────────────────────────────────────────────────────────────
+export function LogOutIcon({ size = 16, color = '#DC2626' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Polyline
+        points="16 17 21 12 16 7"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Line x1="21" y1="12" x2="9" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+// ─── Share / Export Arrow Icon ───────────────────────────────────────────────
+export function ShareIcon({ size = 16, color = '#0B132B' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M4 12V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V12"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Polyline
+        points="16 6 12 2 8 6"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Line
+        x1="12"
+        y1="2"
+        x2="12"
+        y2="15"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+// ─── Printer / Document Icon ─────────────────────────────────────────────────
+export function PrinterIcon({ size = 16, color = '#0B132B' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Polyline
+        points="6 9 6 2 18 2 18 9"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M6 18H4C3.46957 18 2.96086 17.7893 2.58579 17.4142C2.21071 17.0391 2 16.5304 2 16V11C2 10.4696 2.21071 9.96086 2.58579 9.58579C2.96086 9.21071 3.46957 9 4 9H20C20.5304 9 21.0391 9.21071 21.4142 9.58579C21.7893 9.96086 22 10.4696 22 11V16C22 16.5304 21.7893 17.0391 21.4142 17.4142C21.0391 17.7893 20.5304 18 20 18H18"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Rect
+        x="6"
+        y="14"
+        width="12"
+        height="8"
+        rx="1"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}

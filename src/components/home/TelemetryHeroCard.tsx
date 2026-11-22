@@ -1,11 +1,10 @@
-import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
-import { router } from 'expo-router';
-import Svg, { Circle } from 'react-native-svg';
 import { AppText } from '@/components/ui';
-import { ShieldCheckIcon, TrendUpIcon, ChevronRightIcon } from '@/components/ui/icons';
-import { Spacing, Radii, Shadow } from '@/constants/theme';
+import { ChevronRightIcon, ShieldCheckIcon, TrendUpIcon } from '@/components/ui/icons';
+import { Radii, Shadow, Spacing } from '@/constants/theme';
 import { ScanReport } from '@/types/scan';
+import { router } from 'expo-router';
+import { Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 
 interface TelemetryHeroCardProps {
   report?: ScanReport | null;

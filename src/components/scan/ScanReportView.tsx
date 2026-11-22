@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { AppText } from '@/components/ui';
 import { SparkleWandIcon, DocumentReportIcon } from '@/components/ui/icons';
 import { Spacing, Radii, Colors } from '@/constants/theme';
 import { ScanReport } from '@/types/scan';
+import { ClinicalDossierModal } from '@/components/report';
 import { ScanHeader } from './ScanHeader';
 import { HealthIndexCard } from './HealthIndexCard';
 import { ZonalBiometricMap } from './ZonalBiometricMap';
@@ -21,14 +22,11 @@ export interface ScanReportViewProps {
 
 export function ScanReportView({ report, onReturn }: ScanReportViewProps) {
   const [exported, setExported] = useState(false);
+  const [showDossierModal, setShowDossierModal] = useState(false);
 
   const handleExportPdf = () => {
     setExported(true);
-    Alert.alert(
-      'Clinical Report Exported',
-      'Your FaceScan AI biometric diagnosis has been generated and saved as a high-resolution PDF document.',
-      [{ text: 'Done', style: 'default' }],
-    );
+    setShowDossierModal(true);
   };
 
   return (
@@ -87,6 +85,13 @@ export function ScanReportView({ report, onReturn }: ScanReportViewProps) {
           </AppText>
         </View>
       </ScrollView>
+
+      {/* ── Clinical Diagnostic & Care Dossier Modal ──────────── */}
+      <ClinicalDossierModal
+        visible={showDossierModal}
+        onClose={() => setShowDossierModal(false)}
+        report={report}
+      />
     </SafeAreaView>
   );
 }
